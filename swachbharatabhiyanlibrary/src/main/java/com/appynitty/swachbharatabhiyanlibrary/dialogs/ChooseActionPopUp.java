@@ -18,9 +18,6 @@ import android.widget.ImageView;
 
 import com.appynitty.swachbharatabhiyanlibrary.R;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -88,15 +85,6 @@ public class ChooseActionPopUp extends Dialog {
 
         Bitmap bmp = writeOnImage(formattedDate);
         ivQR_image.setImageBitmap(bmp);
-        File f = new File(mPath);
-        try {
-            FileOutputStream fos = new FileOutputStream(f);
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
 
     }
 
