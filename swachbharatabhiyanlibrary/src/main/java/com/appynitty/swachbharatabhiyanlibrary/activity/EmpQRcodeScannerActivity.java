@@ -594,7 +594,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
             qrLocationPojo.setGcType(getGCType(id));
             qrLocationPojo.setDate(AUtils.getServerDateTime());
-            qrLocationPojo.setQRCodeImage(encodedImage);
+            qrLocationPojo.setQRCodeImage("data:image/jpeg;base64," + encodedImage);
             startSubmitQRAsyncTask(qrLocationPojo);
         } catch (Exception e) {
             e.printStackTrace();
