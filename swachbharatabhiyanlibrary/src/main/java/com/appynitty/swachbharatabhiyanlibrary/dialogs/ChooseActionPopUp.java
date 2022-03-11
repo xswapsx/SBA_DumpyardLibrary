@@ -21,6 +21,10 @@ import com.appynitty.swachbharatabhiyanlibrary.R;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class ChooseActionPopUp extends Dialog {
 
@@ -72,10 +76,17 @@ public class ChooseActionPopUp extends Dialog {
     }
 
     private void initData() {
+
+        Date c = Calendar.getInstance().getTime();
+        System.out.println("Current time => " + c);
+
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm", Locale.getDefault());
+        String formattedDate = df.format(c);
+
         Bitmap myBitmap = BitmapFactory.decodeFile(mPath);
         ivQR_image.setImageBitmap(myBitmap);
 
-        Bitmap bmp = writeOnImage("03-09-2022 18:22:06\nHPSBA3000");
+        Bitmap bmp = writeOnImage(formattedDate);
         ivQR_image.setImageBitmap(bmp);
         File f = new File(mPath);
         try {
@@ -116,36 +127,19 @@ public class ChooseActionPopUp extends Dialog {
 
     }
 
-    public Bitmap addTextToImage(Bitmap src, String textToAddOnImage, int x, int y, int color, int alpha, int size, boolean underline) {
-        int w = src.getWidth();
-        int h = src.getHeight();
-        Bitmap result = Bitmap.createBitmap(w, h, src.getConfig());
 
-        Canvas canvas = new Canvas(result);
-        canvas.drawBitmap(src, 0, 0, null);
-
-        Paint paint = new Paint();
-        paint.setColor(color);
-        paint.setAlpha(alpha);
-        paint.setTextSize(size);
-        paint.setAntiAlias(true);
-        paint.setUnderlineText(underline);
-        canvas.drawText(textToAddOnImage, x, y, paint);
-
-        return result;
-    }
-
-    public Bitmap writeOnImage(String text) {
+    public Bitmap writeOnImage(String mDate) {
 
         Bitmap bm = BitmapFactory.decodeFile(mPath);
         Bitmap mutableBitmap = bm.copy(Bitmap.Config.ARGB_8888, true);
         Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setColor(Color.CYAN);
         paint.setTextSize(20);
 
         Canvas canvas = new Canvas(mutableBitmap);
-        canvas.drawText(text, 0, mutableBitmap.getHeight() / 2, paint);
+        canvas.drawText(mDate, 0, mutableBitmap.getHeight() / 2, paint);
+        canvas.drawText(mId, 80, 50, paint);
 
         return mutableBitmap;
     }
