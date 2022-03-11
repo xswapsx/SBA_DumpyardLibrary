@@ -138,8 +138,8 @@ public class ChooseActionPopUp extends Dialog {
         paint.setTextSize(20);
 
         Canvas canvas = new Canvas(mutableBitmap);
-        canvas.drawText(mDate, 0, mutableBitmap.getHeight() / 2, paint);
-        canvas.drawText(mId, 80, 50, paint);
+        canvas.drawText(mDate, 25, 245, paint);
+        canvas.drawText("ID: " + mId, 45, 225, paint);
 
         return mutableBitmap;
     }
