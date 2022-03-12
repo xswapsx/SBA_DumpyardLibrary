@@ -5,23 +5,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import com.appynitty.swachbharatabhiyanlibrary.R;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import com.appynitty.swachbharatabhiyanlibrary.utils.AUtils;
 
 public class ChooseActionPopUp extends Dialog {
 
@@ -46,7 +37,6 @@ public class ChooseActionPopUp extends Dialog {
     public void setData(String mId, String mPath) {
         this.mId = mId;
         this.mPath = mPath;
-        Log.e(TAG, "setData: id:- " + this.mId + ", Path:- " + this.mPath);
     }
 
     @Override
@@ -74,16 +64,7 @@ public class ChooseActionPopUp extends Dialog {
 
     private void initData() {
 
-        Date c = Calendar.getInstance().getTime();
-        System.out.println("Current time => " + c);
-
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm", Locale.getDefault());
-        String formattedDate = df.format(c);
-
-        Bitmap myBitmap = BitmapFactory.decodeFile(mPath);
-        ivQR_image.setImageBitmap(myBitmap);
-
-        Bitmap bmp = writeOnImage(formattedDate);
+        Bitmap bmp = AUtils.writeOnImage(AUtils.getDateAndTime(), mId, mPath);
         ivQR_image.setImageBitmap(bmp);
 
     }
@@ -113,23 +94,6 @@ public class ChooseActionPopUp extends Dialog {
             }
         });
 
-    }
-
-
-    public Bitmap writeOnImage(String mDate) {
-
-        Bitmap bm = BitmapFactory.decodeFile(mPath);
-        Bitmap mutableBitmap = bm.copy(Bitmap.Config.ARGB_8888, true);
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(Color.CYAN);
-        paint.setTextSize(20);
-
-        Canvas canvas = new Canvas(mutableBitmap);
-        canvas.drawText(mDate, 25, 245, paint);
-        canvas.drawText("ID: " + mId, 45, 225, paint);
-
-        return mutableBitmap;
     }
 
     private void dismissPopup() {
