@@ -1,15 +1,19 @@
 package com.appynitty.swachbharatabhiyanlibrary.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -69,7 +73,7 @@ public class EmpDashboardActivity extends AppCompatActivity implements EmpPopUpD
     private TextView userName;
     private TextView empId;
     private ImageView profilePic;
-
+    FrameLayout progressBar;
     private EmpInPunchPojo empInPunchPojo = null;
 
     private UserDetailPojo userDetailPojo;
@@ -136,6 +140,38 @@ public class EmpDashboardActivity extends AppCompatActivity implements EmpPopUpD
         checkIsFromLogin();
 
         initUserDetails();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 101) {
+            switch (resultCode) {
+                case Activity.RESULT_OK:
+                    // All required changes were successfully made
+//                    Toast.makeText(DashboardActivity.this, "Turning on the GPS\nPlease wait..." + "", Toast.LENGTH_SHORT).show();
+
+                    progressBar.setVisibility(View.VISIBLE);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    }, 5000);
+
+                    break;
+                case Activity.RESULT_CANCELED:
+                    // The user was asked to change settings, but chose not to
+                    Toast.makeText(EmpDashboardActivity.this, "Canceled", Toast.LENGTH_SHORT).show();
+                       /* stopService();
+                        MainActivity.this.finishAndRemoveTask();*/
+
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     @Override
@@ -243,7 +279,7 @@ public class EmpDashboardActivity extends AppCompatActivity implements EmpPopUpD
         mContext = EmpDashboardActivity.this;
         AUtils.currentContextConstant = mContext;
         checkIsFromLogin();
-
+        progressBar = findViewById(R.id.empProgress_layout);
         mCheckAttendanceAdapter = new EmpCheckAttendanceAdapterClass();
         mAttendanceAdapter = new EmpAttendanceAdapterClass();
         mUserDetailAdapter = new EmpUserDetailAdapterClass();
@@ -464,7 +500,7 @@ public class EmpDashboardActivity extends AppCompatActivity implements EmpPopUpD
                     }
                 } else {
                     markAttendance.setChecked(false);
-                    AUtils.showGPSSettingsAlert(mContext);
+                    AUtils.gpsStatusCheck(mContext);
                 }
             } else {
                 isLocationPermission = AUtils.isLocationPermissionGiven(EmpDashboardActivity.this);

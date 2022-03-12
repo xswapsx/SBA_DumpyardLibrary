@@ -5,19 +5,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.camera2.CameraCharacteristics;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -57,15 +59,7 @@ import com.appynitty.swachbharatabhiyanlibrary.utils.AUtils;
 import com.appynitty.swachbharatabhiyanlibrary.utils.MyApplication;
 import com.appynitty.swachbharatabhiyanlibrary.webservices.IMEIWebService;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.ResolvableApiException;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStates;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -141,7 +135,7 @@ public class DashboardActivity extends AppCompatActivity implements PopUpDialog.
 
     //    private WorkManager workManager;
     MediaPlayer mp = null;
-
+    FrameLayout pb;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -156,7 +150,7 @@ public class DashboardActivity extends AppCompatActivity implements PopUpDialog.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initComponents();
-        statusCheck();
+        AUtils.gpsStatusCheck(DashboardActivity.this);
         onSwitchStatus(AUtils.isIsOnduty());
 //        Log.e(TAG, "Location Coordinates:- " + Prefs.getString(AUtils.LAT, null) + ", " + Prefs.getString(AUtils.LONG, null));
 
@@ -352,7 +346,16 @@ public class DashboardActivity extends AppCompatActivity implements PopUpDialog.
             switch (resultCode) {
                 case Activity.RESULT_OK:
                     // All required changes were successfully made
-//                    Toast.makeText(DashboardActivity.this, "Turning on the GPS..." + "", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(DashboardActivity.this, "Turning on the GPS\nPlease wait..." + "", Toast.LENGTH_SHORT).show();
+
+                    pb.setVisibility(View.VISIBLE);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            pb.setVisibility(View.GONE);
+                        }
+                    }, 5000);
+
                     break;
                 case Activity.RESULT_CANCELED:
                     // The user was asked to change settings, but chose not to
@@ -561,7 +564,7 @@ public class DashboardActivity extends AppCompatActivity implements PopUpDialog.
         mUserDetailAdapter = new UserDetailAdapterClass();
         verifyDataAdapterClass = new VerifyDataAdapterClass(mContext);
         mOfflineAttendanceAdapter = new OfflineAttendanceAdapterClass(mContext);
-
+        pb = findViewById(R.id.progress_layout);
         lastLocationRepository = new LastLocationRepository(mContext);
         syncOfflineRepository = new SyncOfflineRepository(mContext);
         syncOfflineAttendanceRepository = new SyncOfflineAttendanceRepository(mContext);
@@ -676,11 +679,11 @@ public class DashboardActivity extends AppCompatActivity implements PopUpDialog.
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                statusCheck();
+                AUtils.gpsStatusCheck(DashboardActivity.this);
                 if (AUtils.isInternetAvailable(AUtils.mainApplicationConstant)) {
                     onSwitchStatus(isChecked);
                 } else {
-                    Toast.makeText(mContext, getResources().getString(R.string.no_internet_error), Toast.LENGTH_SHORT).show();
+                    /*Toast.makeText(mContext, getResources().getString(R.string.no_internet_error), Toast.LENGTH_SHORT).show();*/
                     markAttendance.setChecked(AUtils.isIsOnduty());
                 }
 
@@ -690,9 +693,7 @@ public class DashboardActivity extends AppCompatActivity implements PopUpDialog.
         mUserDetailAdapter.setUserDetailListener(new UserDetailAdapterClass.UserDetailListener() {
             @Override
             public void onSuccessCallBack() {
-
                 initUserDetails();
-
             }
 
             @Override
@@ -806,7 +807,8 @@ public class DashboardActivity extends AppCompatActivity implements PopUpDialog.
                     if (AUtils.isInternetAvailable())
                         verifyOfflineData(LoginActivity.class, true);
                     else
-                        AUtils.warning(mContext, getResources().getString(R.string.no_internet_error));
+                        Log.d(TAG, "onClick: no internet!");
+                    /* AUtils.warning(mContext, getResources().getString(R.string.no_internet_error));*/
                 } else {
                     AUtils.info(mContext, getResources().getString(R.string.off_duty_warning));
                 }
@@ -1186,57 +1188,4 @@ public class DashboardActivity extends AppCompatActivity implements PopUpDialog.
         super.onDestroy();
     }
 
-    public void statusCheck() {
-
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10);
-        mLocationRequest.setSmallestDisplacement(10);
-        mLocationRequest.setFastestInterval(10);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        LocationSettingsRequest.Builder builder = new
-                LocationSettingsRequest.Builder();
-        builder.addLocationRequest(mLocationRequest);
-
-        Task<LocationSettingsResponse> task = LocationServices.getSettingsClient(this).checkLocationSettings(builder.build());
-
-
-        task.addOnCompleteListener(task1 -> {
-            try {
-                LocationSettingsResponse response = task1.getResult(ApiException.class);
-                // All location settings are satisfied. The client can initialize location
-                // requests here.
-
-            } catch (ApiException exception) {
-                switch (exception.getStatusCode()) {
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied. But could be fixed by showing the
-                        // user a dialog.
-                        try {
-                            // Cast to a resolvable exception.
-                            ResolvableApiException resolvable = (ResolvableApiException) exception;
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            resolvable.startResolutionForResult(
-                                    DashboardActivity.this,
-                                    101);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        } catch (ClassCastException e) {
-                            // Ignore, should be an impossible error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way to fix the
-                        // settings so we won't show the dialog.
-                        break;
-                }
-            }
-        });
-
-/*
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            buildAlertMessageNoGps();
-
-        }*/
-    }
 }
