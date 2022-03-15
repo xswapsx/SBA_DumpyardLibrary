@@ -694,7 +694,9 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
                 contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/" + "Gram Panchayat");
                 Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
                 fos = resolver.openOutputStream(imageUri);
-                thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+                Log.e(TAG, "onCaptureImageResult:- width:- " + thumbnail.getWidth() + ", height:- " + thumbnail.getHeight());
+//                thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 destination = new File(String.valueOf(contentValues), System.currentTimeMillis() + ".jpg");
 
             } else {

@@ -759,6 +759,8 @@ public class AUtils extends CommonUtils {
         return mutableBitmap;
     }
 
+
+
     public static String getDateAndTime() {
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);
