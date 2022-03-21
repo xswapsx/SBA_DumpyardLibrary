@@ -6,6 +6,7 @@
 
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
+    <color name="blackTransparent">#3C000000</color>
 
     <color name="yellow">#ffdd00</color>
 

@@ -1,5 +1,7 @@
 package com.appynitty.swachbharatabhiyanlibrary.activity;
 
+import static android.graphics.Bitmap.Config.ARGB_8888;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -12,6 +14,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.hardware.Camera;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
@@ -32,6 +36,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -82,8 +87,11 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
     private EmpQrLocationAdapterClass empQrLocationAdapter;
     private QrLocationPojo qrLocationPojo;
     private static final int REQUEST_CAMERA = 22;
+    private static int CAMERA_FACING_BACK;
     private EmpSyncServerRepository empSyncServerRepository;
     private Gson gson;
+    Camera mCamera;
+    boolean isChecked = true;
 
     private MyProgressDialog myProgressDialog;
     private ArrayList<Integer> mSelectedIndices;
@@ -143,6 +151,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
             } else if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) mContext, Manifest.permission.CAMERA)) {
 
                 AUtils.showPermissionDialog(mContext, "CAMERA", new DialogInterface.OnClickListener() {
+                    @SuppressLint("UnsupportedChromeOsCameraSystemFeature")
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -219,7 +228,13 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         if (AUtils.isInternetAvailable()) {
             AUtils.hideSnackBar();
         } else {
-            AUtils.showSnackBar(findViewById(R.id.parent));
+            if (isChecked){
+                //not assign
+            }else {
+
+                AUtils.showSnackBar(findViewById(R.id.parent));
+            }
+
         }
     }
 
@@ -454,7 +469,9 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         Log.e(TAG, "submitQRcode: " + houseid);
         mHouse_id = houseid;
         if (validSubmitId(houseid.toLowerCase())) {
-            takePhotoImageViewOnClick();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                takePhotoImageViewOnClick();
+            }
 //            showActionPopUp(houseid);
 
         } else {
@@ -528,10 +545,19 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     private void takePhotoImageViewOnClick() {
 //        hideQR();
+
         setContentView(R.layout.layout_blank);
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        /*Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, REQUEST_CAMERA);
+        Camera.open(0);*/
+
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra("android.intent.extras.CAMERA_FACING", 0);
+        /*intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+        intent.putExtra(MediaStore.QUERY_ARG_RELATED_URI, 1);*/
         startActivityForResult(intent, REQUEST_CAMERA);
     }
 
@@ -539,7 +565,10 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 //        scannerView.stopCameraPreview();
         Log.e(TAG, "handleResult: " + result.getContents());
         mHouse_id = result.getContents();
-        takePhotoImageViewOnClick();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+
+            takePhotoImageViewOnClick();
+        }
 //        showActionPopUp(result.getContents());
 //        restartPreview();
     }
@@ -631,10 +660,10 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
             finish();
         } else if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CAMERA) {
+                mCamera= Camera.open(0);
                 onCaptureImageResult(data);
             }
         }
-
 
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -672,7 +701,15 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         empSyncServerRepository.insertEmpSyncServerEntity(gson.toJson(pojo, type));
 
         myProgressDialog.dismiss();
-        AUtils.success(mContext, getString(R.string.success_message), Toast.LENGTH_LONG);
+       // AUtils.success(mContext, getString(R.string.success_message), Toast.LENGTH_LONG);
+        if (isChecked){
+            if (!AUtils.isInternetAvailable()){
+                Toast.makeText(mContext, "Submitted successfully", Toast.LENGTH_SHORT).show();
+            }
+        }else {
+            AUtils.success(mContext, getString(R.string.success_message), Toast.LENGTH_LONG);
+        }
+
         finish();
     }
 
@@ -695,8 +732,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
                 Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
                 fos = resolver.openOutputStream(imageUri);
 
-                Log.e(TAG, "onCaptureImageResult:- width:- " + thumbnail.getWidth() + ", height:- " + thumbnail.getHeight());
-//                thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 destination = new File(String.valueOf(contentValues), System.currentTimeMillis() + ".jpg");
 
             } else {
@@ -709,7 +745,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
                 }
                 destination = new File(dir, System.currentTimeMillis() + ".jpg");
                 fos = new FileOutputStream(destination);
-                thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                thumbnail.compress(Bitmap.CompressFormat.PNG, 500, fos);
             }
 
             fos.flush();
@@ -732,15 +768,41 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         showActionPopUp(mHouse_id);
 
         Bitmap bm = BitmapFactory.decodeFile(finalPath);
-        Bitmap newBitmap = AUtils.writeOnImage(AUtils.getDateAndTime(), mHouse_id, mImagePath);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Bitmap newBitmap = AUtils.writeOnImage(AUtils.getDateAndTimeN(), mHouse_id, mImagePath);
+
+       /* ByteArrayOutputStream baos = new ByteArrayOutputStream();
         newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // bm is the bitmap object
-        byte[] byteArrayImage = baos.toByteArray();
+        byte[] byteArrayImage = baos.toByteArray();*/
 
-        encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
+       //Bitmap sizeImage = AUtils.resizeImage(newBitmap, 500,true);
+       Bitmap sizeImage = AUtils.getResizedBitmapNew(newBitmap, 300,466);
+        Bitmap shadowImage32 = sizeImage.copy(ARGB_8888, true);
+        //encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
+        encodedImage = BitMapToString(shadowImage32);
+
         Log.d(TAG, "onCaptureImageResult: Base64:- " + encodedImage);
 
+    }
+
+    public String BitMapToString(Bitmap bitmap){
+        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100, baos);
+        byte [] b=baos.toByteArray();
+        String temp=null;
+        try{
+            System.gc();
+            temp=Base64.encodeToString(b, Base64.DEFAULT);
+        }catch(Exception e){
+            e.printStackTrace();
+        }catch(OutOfMemoryError e){
+            baos=new  ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG,80, baos);
+            b=baos.toByteArray();
+            temp=Base64.encodeToString(b, Base64.DEFAULT);
+            Log.e("Memory Loss", "Out of memory error catched");
+        }
+        return temp;
     }
 
     /**

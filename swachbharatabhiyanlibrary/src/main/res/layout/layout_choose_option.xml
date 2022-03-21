@@ -40,17 +40,28 @@
             android:textColor="@color/colorBlue"
             android:textSize="@dimen/dim_18_sp" />
 
-        <ImageView
-            android:id="@+id/iv_QR_image"
-            android:layout_width="@dimen/dim_120_dp"
-            android:layout_height="@dimen/dim_120_dp"
-            android:layout_marginStart="@dimen/dim_10_dp"
-            android:layout_marginEnd="@dimen/dim_10_dp"
-            android:layout_marginBottom="@dimen/dim_20_dp"
-            android:background="@color/colorDivider"
-            android:contentDescription="@string/title_activity_dump_yard_weight"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_photo_camera_light_gray_50dp" />
+            <ImageView
+                android:id="@+id/imgQRimg"
+                android:layout_width="@dimen/dim_120_dp"
+                android:layout_height="@dimen/dim_120_dp"
+                android:layout_marginStart="@dimen/dim_10_dp"
+                android:layout_marginEnd="@dimen/dim_10_dp"
+                android:layout_marginBottom="@dimen/dim_20_dp"
+                android:background="@color/colorDivider"
+                android:contentDescription="@string/title_activity_dump_yard_weight"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_photo_camera_light_gray_50dp" />
+
+        <TextView
+            android:id="@+id/txt_houseId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dim_10_dp"
+            android:gravity="center_horizontal"
+            android:textColor="@color/black"
+            android:textSize="@dimen/dim_18_sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btn_skip"
