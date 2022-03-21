@@ -121,7 +121,6 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
 
             String refId;
 
-
             for (int i = 0; i < locationPojoList.size(); i++) {
                 refId = locationPojoList.get(i).getReferanceId();
                 if (refId.substring(0, 2).matches("^[HhPp]+$")) {
