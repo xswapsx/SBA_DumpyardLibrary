@@ -8,16 +8,10 @@ import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ImageDecoder;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -26,7 +20,6 @@ import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 
 import com.appynitty.swachbharatabhiyanlibrary.R;
@@ -733,7 +726,7 @@ public class AUtils extends CommonUtils {
         Bitmap bitmap = getImageBitmap(_sourcePath, _context);
         if (bitmap != null) {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
             byte[] array = byteArrayOutputStream.toByteArray();
             String encode = Base64.encodeToString(array, Base64.DEFAULT);
             encoded = String.format("data:image/jpg;Base64,%s", encode);
@@ -746,172 +739,31 @@ public class AUtils extends CommonUtils {
 
     }
 
-    public static Bitmap resizeImage(Bitmap realImage, float maxImageSize,
-                                     boolean filter) {
-        float ratio = Math.min(
-                (float) maxImageSize / realImage.getWidth(),
-                (float) maxImageSize / realImage.getHeight());
-        int width = Math.round((float) ratio * realImage.getWidth());
-        int height = Math.round((float) ratio * realImage.getHeight());
-
-        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
-                height, filter);
-        return newBitmap;
-    }
-
     public static Bitmap writeOnImage(String mDate, String mId, String mPath) {
-        Context context;
-        final String latitude = Prefs.getString(AUtils.LAT,"");
-        final String longitude = Prefs.getString(AUtils.LONG,"");
 
-        /*String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-        String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-        String dateTimeN = currentDate +" "+currentTime;*/
+        final String lat = Prefs.getString(AUtils.LAT, "");
+        final String lon = Prefs.getString(AUtils.LONG, "");
 
         Bitmap bm = BitmapFactory.decodeFile(mPath);
         Bitmap mutableBitmap = bm.copy(Bitmap.Config.ARGB_8888, true);
-
-       /* Bitmap background = Bitmap.createBitmap((int)500, (int)500, Bitmap.Config.ARGB_8888);
-        Bitmap.createScaledBitmap(bm, 450, 450, true);*/
-        BlurMaskFilter blurFilter = new BlurMaskFilter(2, BlurMaskFilter.Blur.OUTER);
-
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setColor(Color.CYAN);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setMaskFilter(blurFilter);
-        paint.setTextSize(8f);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-        paint.setAntiAlias(true);
-        paint.setFakeBoldText(true);
-        paint.setUnderlineText(false);
+        paint.setTextSize(10);
+
+
         Canvas canvas = new Canvas(mutableBitmap);
-        canvas.drawBitmap(bm, 0, 0, paint);
-        paint.setColor(Color.WHITE);
-        //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-       // canvas.drawBitmap (mutableBitmap, 0,  0,null);
 
-        Paint paintRect = new Paint();
-        paintRect.setColor(Color.DKGRAY );
-        paintRect.setStyle(Paint.Style.FILL_AND_STROKE);
-        paintRect.setStrokeWidth(5);
-        float leftx = 160;
-        float topy = 210;
-        float rightx = 0;
-        float bottomy = 150;
-
-        canvas.drawRect(leftx, topy, rightx, bottomy, paintRect);
-        canvas.save();
-        canvas.drawText("Date - " +mDate, 80, 160, paint);
-        canvas.drawText("House Id - " + mId, 72, 170, paint);
-        canvas.drawText("Lat - "+latitude, 60, 180, paint);
-        canvas.drawText("Long - "+longitude, 63, 190, paint);
+        canvas.drawText(mDate, 100, 235, paint);
+        canvas.drawText("ID: " + mId, 100, 225, paint);
+        canvas.drawText("Lat: " + lat , 100, 215, paint);
+        canvas.drawText("Long: " + lon , 100, 205, paint);
+//        canvas.drawCircle(50, 50, 10, paint);
 
         return mutableBitmap;
     }
 
-    public static Bitmap getResizedBitmapNew(Bitmap bitmap, int newWidth, int newHeight) {
-        Bitmap resizedBitmap = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888);
-
-        float scaleX = newWidth / (float) bitmap.getWidth();
-        float scaleY = newHeight / (float) bitmap.getHeight();
-        float pivotX = 0;
-        float pivotY = 0;
-
-        Matrix scaleMatrix = new Matrix();
-        scaleMatrix.setScale(scaleX, scaleY, pivotX, pivotY);
-
-        Canvas canvas = new Canvas(resizedBitmap);
-        canvas.setMatrix(scaleMatrix);
-        canvas.drawBitmap(bitmap, 0, 0, new Paint(Paint.FILTER_BITMAP_FLAG));
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        canvas.drawBitmap (resizedBitmap, 0,  0,null);
-
-        return resizedBitmap;
-    }
-
-    public static Bitmap scaleBitmapAndKeepRation(Bitmap targetBmp,int reqHeightInPixels,int reqWidthInPixels)
-    {
-        Matrix matrix = new Matrix();
-        matrix .setRectToRect(new RectF(0, 0, targetBmp.getWidth(), targetBmp.getHeight()), new RectF(0, 0, reqWidthInPixels, reqHeightInPixels), Matrix.ScaleToFit.CENTER);
-        Bitmap scaledBitmap = Bitmap.createBitmap(targetBmp, 0, 0, targetBmp.getWidth(), targetBmp.getHeight(), matrix, true);
-        return scaledBitmap;
-    }
-
-    public static Bitmap scaleBitmap(Bitmap mBitmap) {
-        int ScaleSize = 450;//max Height or width to Scale
-        int width = mBitmap.getWidth();
-        int height = mBitmap.getHeight();
-        float excessSizeRatio = width > height ? width / ScaleSize : height / ScaleSize;
-        Bitmap bitmap = Bitmap.createBitmap(
-                mBitmap, 0, 0,(int) (width/excessSizeRatio),(int) (height/excessSizeRatio));
-        //mBitmap.recycle(); if you are not using mBitmap Obj
-        return bitmap;
-    }
-
-    public static  Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // CREATE A MATRIX FOR THE MANIPULATION
-        Matrix matrix = new Matrix();
-        // RESIZE THE BIT MAP
-        matrix.postScale(scaleWidth, scaleHeight);
-
-        // "RECREATE" THE NEW BITMAP
-        Bitmap resizedBitmap = Bitmap.createBitmap(
-                bm, 0, 0, width, height, matrix, false);
-        bm.recycle();
-        return resizedBitmap;
-    }
-
-    public static void drawCenter(Canvas canvas, Paint paint, String text) {
-        Rect r = new Rect();
-        canvas.getClipBounds(r);
-        int cHeight = r.height();
-        int cWidth = r.width();
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.getTextBounds(text, 0, text.length(), r);
-        float x = cWidth / 2f - r.width() / 2f - r.left;
-        float y = cHeight / 2f + r.height() / 2f - r.bottom;
-        canvas.drawText(text, x, y, paint);
-    }
-
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId, int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(res, resId, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeResource(res, resId, options);
-    }
-
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
 
     public static String getDateAndTime() {
         Date c = Calendar.getInstance().getTime();
@@ -923,17 +775,9 @@ public class AUtils extends CommonUtils {
         return formattedDate;
     }
 
-    public static String getDateAndTimeN() {
-        Date c = Calendar.getInstance().getTime();
-        System.out.println("Current time => " + c);
-
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm aa", Locale.ENGLISH);
-        String formattedDate = df.format(c);
-
-        return formattedDate;
-    }
-
-    /** Created by Swapnil */
+    /**
+     * Created by Swapnil
+     */
     public static void gpsStatusCheck(Context ctx) {
 
         LocationRequest mLocationRequest = new LocationRequest();

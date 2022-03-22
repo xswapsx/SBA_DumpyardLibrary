@@ -769,17 +769,18 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
         Bitmap bm = BitmapFactory.decodeFile(finalPath);
 
-        Bitmap newBitmap = AUtils.writeOnImage(AUtils.getDateAndTimeN(), mHouse_id, mImagePath);
+        Bitmap newBitmap = AUtils.writeOnImage(AUtils.getDateAndTime(), mHouse_id, mImagePath);
 
-       /* ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // bm is the bitmap object
-        byte[] byteArrayImage = baos.toByteArray();*/
+        byte[] byteArrayImage = baos.toByteArray();
 
        //Bitmap sizeImage = AUtils.resizeImage(newBitmap, 500,true);
-       Bitmap sizeImage = AUtils.getResizedBitmapNew(newBitmap, 300,466);
-        Bitmap shadowImage32 = sizeImage.copy(ARGB_8888, true);
-        //encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
-        encodedImage = BitMapToString(shadowImage32);
+      /* Bitmap sizeImage = AUtils.getResizedBitmapNew(newBitmap, 300,466);
+        Bitmap shadowImage32 = sizeImage.copy(ARGB_8888, true);*/
+        encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
+
+//        encodedImage = BitMapToString(shadowImage32);
 
         Log.d(TAG, "onCaptureImageResult: Base64:- " + encodedImage);
 

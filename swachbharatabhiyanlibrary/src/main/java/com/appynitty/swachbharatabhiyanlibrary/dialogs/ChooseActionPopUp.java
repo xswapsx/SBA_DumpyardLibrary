@@ -7,8 +7,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -76,10 +74,10 @@ public class ChooseActionPopUp extends Dialog {
     private void initData() {
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            bmp = AUtils.writeOnImage(AUtils.getDateAndTimeN(),mId, mPath);
+            bmp = AUtils.writeOnImage(AUtils.getDateAndTime(), mId, mPath);
 
-        // result =  AUtils.resizeImage(bmp, 800,true);
-         // result1 =  AUtils.scaleBitmapAndKeepRation(bmp, 480,560);
+            // result =  AUtils.resizeImage(bmp, 800,true);
+            // result1 =  AUtils.scaleBitmapAndKeepRation(bmp, 480,560);
         }
         Bitmap shadowImage32 = bmp.copy(ARGB_8888, true);
         ivQR_image.setImageBitmap(shadowImage32);
@@ -115,12 +113,12 @@ public class ChooseActionPopUp extends Dialog {
         ivQR_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isImageFitToScreen) {
-                    isImageFitToScreen=false;
+                if (isImageFitToScreen) {
+                    isImageFitToScreen = false;
                     ivQR_image.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                     ivQR_image.setAdjustViewBounds(true);
-                }else{
-                    isImageFitToScreen=true;
+                } else {
+                    isImageFitToScreen = true;
                     ivQR_image.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
                     ivQR_image.setScaleType(ImageView.ScaleType.FIT_XY);
                 }
@@ -130,31 +128,31 @@ public class ChooseActionPopUp extends Dialog {
     }
 
 
-   /* private void setPic() {
-        // Get the dimensions of the View
-        int targetW = ivQR_image.getWidth();
-        int targetH = ivQR_image.getHeight();
+    /* private void setPic() {
+         // Get the dimensions of the View
+         int targetW = ivQR_image.getWidth();
+         int targetH = ivQR_image.getHeight();
 
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
+         // Get the dimensions of the bitmap
+         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+         bmOptions.inJustDecodeBounds = true;
+         BitmapFactory.decodeFile(mPath, bmOptions);
+         int photoW = bmOptions.outWidth;
+         int photoH = bmOptions.outHeight;
 
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+         // Determine how much to scale down the image
+         int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
 
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
+         // Decode the image file into a Bitmap sized to fill the View
+         bmOptions.inJustDecodeBounds = false;
+         bmOptions.inSampleSize = scaleFactor;
+         bmOptions.inPurgeable = true;
 
-        //Bitmap bmp = AUtils.writeOnImage(AUtils.getDateAndTime(), mId, mPath);
-        Bitmap bitmap = BitmapFactory.decodeFile(mPath, bmOptions);
-        ivQR_image.setImageBitmap(bitmap);
-    }
-*/
+         //Bitmap bmp = AUtils.writeOnImage(AUtils.getDateAndTime(), mId, mPath);
+         Bitmap bitmap = BitmapFactory.decodeFile(mPath, bmOptions);
+         ivQR_image.setImageBitmap(bitmap);
+     }
+ */
     private void dismissPopup() {
         this.dismiss();
     }
