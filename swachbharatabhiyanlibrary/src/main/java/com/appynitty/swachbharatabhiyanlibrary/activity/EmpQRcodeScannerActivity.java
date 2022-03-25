@@ -1,7 +1,5 @@
 package com.appynitty.swachbharatabhiyanlibrary.activity;
 
-import static android.graphics.Bitmap.Config.ARGB_8888;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,13 +12,11 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
@@ -36,10 +32,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.appynitty.retrofitconnectionlibrary.pojos.ResultPojo;
 import com.appynitty.swachbharatabhiyanlibrary.R;
@@ -71,7 +67,10 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView;
 public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarScannerView.ResultHandler {
 
     private final static String TAG = "EmpQRcodeScannerActivity";
-
+    /**
+     * permission code
+     */
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1013;
     private Context mContext;
     private Toolbar toolbar;
     private ZBarScannerView scannerView;
@@ -188,6 +187,14 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
                 });
             }
 
+        } else if (requestCode == MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                readFile();
+            } else {
+                // Permission Denied
+                Toast.makeText(EmpQRcodeScannerActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+            return;
         }
     }
 
@@ -228,9 +235,9 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         if (AUtils.isInternetAvailable()) {
             AUtils.hideSnackBar();
         } else {
-            if (isChecked){
+            if (isChecked) {
                 //not assign
-            }else {
+            } else {
 
                 AUtils.showSnackBar(findViewById(R.id.parent));
             }
@@ -469,9 +476,9 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         Log.e(TAG, "submitQRcode: " + houseid);
         mHouse_id = houseid;
         if (validSubmitId(houseid.toLowerCase())) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                takePhotoImageViewOnClick();
-            }
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//                takePhotoImageViewOnClick();
+//            }
 //            showActionPopUp(houseid);
 
         } else {
@@ -496,9 +503,18 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
             contentView.setVisibility(View.VISIBLE);
             permissionBtn.setVisibility(View.GONE);
             checkLocationPermission();
+
         } else {
             contentView.setVisibility(View.GONE);
             permissionBtn.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    private void isStoragePermissionGiven() {
+        if (AUtils.isStoragePermissionGiven(mContext)) {
+            //You already have the permission, just go ahead.
+//            isLocationPermissionGiven();
         }
     }
 
@@ -533,6 +549,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
         if (AUtils.isLocationPermissionGiven(mContext)) {
             //You already have the permission, just go ahead.
+            isStoragePermissionGiven();
             LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
             boolean GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -545,7 +562,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
+
     private void takePhotoImageViewOnClick() {
 //        hideQR();
 
@@ -565,10 +582,10 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 //        scannerView.stopCameraPreview();
         Log.e(TAG, "handleResult: " + result.getContents());
         mHouse_id = result.getContents();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 
-            takePhotoImageViewOnClick();
-        }
+        takePhotoImageViewOnClick();
+//        }
 //        showActionPopUp(result.getContents());
 //        restartPreview();
     }
@@ -660,7 +677,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
             finish();
         } else if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CAMERA) {
-                mCamera= Camera.open(0);
+                mCamera = Camera.open(0);
                 onCaptureImageResult(data);
             }
         }
@@ -701,12 +718,12 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         empSyncServerRepository.insertEmpSyncServerEntity(gson.toJson(pojo, type));
 
         myProgressDialog.dismiss();
-       // AUtils.success(mContext, getString(R.string.success_message), Toast.LENGTH_LONG);
-        if (isChecked){
-            if (!AUtils.isInternetAvailable()){
+        // AUtils.success(mContext, getString(R.string.success_message), Toast.LENGTH_LONG);
+        if (isChecked) {
+            if (!AUtils.isInternetAvailable()) {
                 Toast.makeText(mContext, "Submitted successfully", Toast.LENGTH_SHORT).show();
             }
-        }else {
+        } else {
             AUtils.success(mContext, getString(R.string.success_message), Toast.LENGTH_LONG);
         }
 
@@ -717,7 +734,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
         File destination;
-
+//        requestRead();
         OutputStream fos;
         try {
 
@@ -735,9 +752,12 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
                 thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 destination = new File(String.valueOf(contentValues), System.currentTimeMillis() + ".jpg");
 
+                fos.flush();
+                fos.close();
+
             } else {
 
-                dir = new File(Environment.getExternalStoragePublicDirectory(
+                /*dir = new File(Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_DCIM), "Gram Panchayat");
 
                 if (!dir.exists()) {
@@ -745,11 +765,33 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
                 }
                 destination = new File(dir, System.currentTimeMillis() + ".jpg");
                 fos = new FileOutputStream(destination);
-                thumbnail.compress(Bitmap.CompressFormat.PNG, 500, fos);
+                thumbnail.compress(Bitmap.CompressFormat.PNG, 500, fos);*/
+
+
+                try {
+
+//changes made
+                    dir = new File(
+                            getExternalFilesDir(null).getAbsolutePath()
+                                    + "/Gram Panchayat");
+
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    destination = new File(dir, System.currentTimeMillis() + ".jpg");
+
+                    FileOutputStream fOut = new FileOutputStream(destination);
+                    thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+                    AUtils.error(mContext, "Unable to add image", Toast.LENGTH_SHORT);
+                }
             }
 
-            fos.flush();
-            fos.close();
+            /*fos.flush();
+            fos.close();*/
 
         } catch (Exception e) {
 
@@ -775,7 +817,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // bm is the bitmap object
         byte[] byteArrayImage = baos.toByteArray();
 
-       //Bitmap sizeImage = AUtils.resizeImage(newBitmap, 500,true);
+        //Bitmap sizeImage = AUtils.resizeImage(newBitmap, 500,true);
       /* Bitmap sizeImage = AUtils.getResizedBitmapNew(newBitmap, 300,466);
         Bitmap shadowImage32 = sizeImage.copy(ARGB_8888, true);*/
         encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
@@ -786,21 +828,21 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
     }
 
-    public String BitMapToString(Bitmap bitmap){
-        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,100, baos);
-        byte [] b=baos.toByteArray();
-        String temp=null;
-        try{
+    public String BitMapToString(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String temp = null;
+        try {
             System.gc();
-            temp=Base64.encodeToString(b, Base64.DEFAULT);
-        }catch(Exception e){
+            temp = Base64.encodeToString(b, Base64.DEFAULT);
+        } catch (Exception e) {
             e.printStackTrace();
-        }catch(OutOfMemoryError e){
-            baos=new  ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,80, baos);
-            b=baos.toByteArray();
-            temp=Base64.encodeToString(b, Base64.DEFAULT);
+        } catch (OutOfMemoryError e) {
+            baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+            b = baos.toByteArray();
+            temp = Base64.encodeToString(b, Base64.DEFAULT);
             Log.e("Memory Loss", "Out of memory error catched");
         }
         return temp;
@@ -833,4 +875,27 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
     /**
      * End of addition
      */
+
+    /**
+     * requestPermissions and do something
+     */
+    public void requestRead() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+        } else {
+            readFile();
+        }
+    }
+
+    private void readFile() {
+
+        Log.e(TAG, "readFile: reading the photo file");
+    }
+
+
 }

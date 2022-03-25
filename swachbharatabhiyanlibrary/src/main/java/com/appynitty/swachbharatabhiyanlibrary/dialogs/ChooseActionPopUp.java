@@ -73,12 +73,7 @@ public class ChooseActionPopUp extends Dialog {
 
     private void initData() {
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            bmp = AUtils.writeOnImage(AUtils.getDateAndTime(), mId, mPath);
-
-            // result =  AUtils.resizeImage(bmp, 800,true);
-            // result1 =  AUtils.scaleBitmapAndKeepRation(bmp, 480,560);
-        }
+        bmp = AUtils.writeOnImage(AUtils.getDateAndTime(), mId, mPath);
         Bitmap shadowImage32 = bmp.copy(ARGB_8888, true);
         ivQR_image.setImageBitmap(shadowImage32);
 
