@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -746,8 +747,9 @@ public class AUtils extends CommonUtils {
 
         Bitmap bm = BitmapFactory.decodeFile(mPath);
         Bitmap mutableBitmap = bm.copy(Bitmap.Config.ARGB_8888, true);
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         paint.setColor(Color.CYAN);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(10);

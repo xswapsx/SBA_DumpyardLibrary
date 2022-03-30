@@ -1106,7 +1106,7 @@ public class DashboardActivity extends AppCompatActivity implements PopUpDialog.
                 }
             } else {
                 markAttendance.setChecked(false);
-                Toast.makeText(mContext, getResources().getString(R.string.no_internet_error), Toast.LENGTH_LONG).show();
+//                Toast.makeText(mContext, getResources().getString(R.string.no_internet_error), Toast.LENGTH_LONG).show();
 //                AUtils.showGPSSettingsAlert(mContext);
             }
         } else {

@@ -234,6 +234,7 @@
     <string name="street_collection_radio">Street Collection</string>
     <string name="waste_collection_radio">Waste Collection</string>
     <string name="app_notification_description" translatable="false">Please don\'t kill the app from background.</string>
+    <string name="turning_on_the_gps_n_please_wait">Turning on the GPS\nPlease wait...</string>
 
 
 </resources>
