@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -35,9 +38,11 @@ import com.google.gson.reflect.TypeToken;
 import com.pixplicity.easyprefs.library.Prefs;
 import com.riaylibrary.utils.LocaleHelper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Type;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class TakePhotoActivity extends AppCompatActivity {
@@ -312,7 +317,11 @@ public class TakePhotoActivity extends AppCompatActivity {
         imagePojo = new Gson().fromJson(
                 Prefs.getString(AUtils.PREFS.IMAGE_POJO, null), type);
 
-
+        if (Prefs.contains(AUtils.BEFORE_IMAGE)) {
+            Bitmap myBitmap = BitmapFactory.decodeFile(Prefs.getString(AUtils.BEFORE_IMAGE, null));
+            Log.e(TAG, "initData: before Image:- " + Prefs.getString(AUtils.BEFORE_IMAGE, null));
+            beforeImage.setImageBitmap(myBitmap);
+        }
 //        if (!AUtils.isNull(imagePojo)) {
 //
 //            if(!AUtils.isNullString(imagePojo.getImage1())) {
@@ -414,12 +423,31 @@ public class TakePhotoActivity extends AppCompatActivity {
         switch (imageViewNo) {
 
             case 1:
+                /*beforeImage.setImageBitmap(thumbnail);
+                beforeImageFilePath = destination.getAbsolutePath();*/
+
+                Uri tempUri;
+                String finalPath;
+
                 beforeImage.setImageBitmap(thumbnail);
-                beforeImageFilePath = destination.getAbsolutePath();
+                tempUri = getImageUri(getApplicationContext(), thumbnail);
+
+                finalPath = getRealPathFromURI(tempUri);
+                beforeImageFilePath = finalPath; //setting image1 path that will be set in imageDTO.
+
+                Prefs.putString(AUtils.BEFORE_IMAGE, beforeImageFilePath);
                 break;
             case 2:
+                /*afterImage.setImageBitmap(thumbnail);
+                afterImageFilePath = destination.getAbsolutePath();*/
+
                 afterImage.setImageBitmap(thumbnail);
-                afterImageFilePath = destination.getAbsolutePath();
+                tempUri = getImageUri(getApplicationContext(), thumbnail);
+
+                finalPath = getRealPathFromURI(tempUri);
+                afterImageFilePath = finalPath; //setting image2 path that will be set in imageDTO.
+
+                Prefs.putString(AUtils.AFTER_IMAGE, afterImageFilePath);
                 break;
         }
 
@@ -463,5 +491,26 @@ public class TakePhotoActivity extends AppCompatActivity {
         } else {
             return false;
         }
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "IMG_" + Calendar.getInstance().getTime(), null);
+        return Uri.parse(path);
+    }
+
+    public String getRealPathFromURI(Uri uri) {
+        String path = "";
+        if (getContentResolver() != null) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                path = cursor.getString(idx);
+                cursor.close();
+            }
+        }
+        return path;
     }
 }
