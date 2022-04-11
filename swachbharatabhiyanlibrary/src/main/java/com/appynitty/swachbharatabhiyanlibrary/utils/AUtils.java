@@ -162,6 +162,7 @@ public class AUtils extends CommonUtils {
 
     public static final String BEFORE_IMAGE = "imageB";
     public static final String AFTER_IMAGE = "imageA";
+    public static final String QR_IMAGE_PATH = "qr_image_path";
 
     private static SyncServerAdapterClass syncServer;
     private static ShareLocationAdapterClass shareLocationAdapterClass;
@@ -743,28 +744,48 @@ public class AUtils extends CommonUtils {
 
     }
 
-    public static Bitmap writeOnImage(String mDate, String mId, String mPath) {
+    public static Bitmap writeOnImage(Context ctx, String mDate, String mId, String mPath) {
 
+        Uri uri = Uri.fromFile(new File(mPath));
         final String lat = Prefs.getString(AUtils.LAT, "");
         final String lon = Prefs.getString(AUtils.LONG, "");
 
-        Bitmap bm = BitmapFactory.decodeFile(mPath);
+        Bitmap bm = loadFromUri(uri, ctx);
         Bitmap mutableBitmap = bm.copy(Bitmap.Config.ARGB_8888, true);
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.FILL);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setColor(Color.CYAN);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(10);
+        paint.setStrokeWidth(2.0f);
+        Typeface plain = Typeface.createFromAsset(mainApplicationConstant.getAssets(), "bebasneuebold.ttf");
+        Typeface bold = Typeface.create(plain, Typeface.NORMAL);
+        paint.setTypeface(bold);
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(30);
+
+
+        Paint stkPaint = new Paint();
+        stkPaint.setStyle(Paint.Style.STROKE);
+        stkPaint.setStrokeWidth(2);
+        stkPaint.setColor(Color.BLACK);
+        stkPaint.setTypeface(bold);
+        stkPaint.setTextSize(30);
 
 
         Canvas canvas = new Canvas(mutableBitmap);
 
-        canvas.drawText(mDate, 100, 235, paint);
-        canvas.drawText("ID: " + mId, 100, 225, paint);
-        canvas.drawText("Lat: " + lat , 100, 215, paint);
-        canvas.drawText("Long: " + lon , 100, 205, paint);
-//        canvas.drawCircle(50, 50, 10, paint);
+        int xPos = (canvas.getWidth() / 2);
+        int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2));
+
+        canvas.drawText("ID: " + mId, 25, yPos + 230, stkPaint);
+        canvas.drawText("ID: " + mId, 25, yPos + 230, paint);
+        canvas.drawText("Lat: " + lat, 25, yPos + 265, stkPaint);
+        canvas.drawText("Lat: " + lat, 25, yPos + 265, paint);
+        canvas.drawText("Long: " + lon, 25, yPos + 295, stkPaint);
+        canvas.drawText("Long: " + lon, 25, yPos + 295, paint);
+        canvas.drawText(mDate, 25, yPos + 330, stkPaint);
+        canvas.drawText(mDate, 25, yPos + 330, paint);
+
 
         return mutableBitmap;
     }
@@ -830,11 +851,25 @@ public class AUtils extends CommonUtils {
             }
         });
 
-/*
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            buildAlertMessageNoGps();
-
-        }*/
     }
+
+    public static Bitmap loadFromUri(Uri photoUri, Context ctx) {
+        Bitmap image = null;
+        try {
+            // check version of Android on device
+            if (Build.VERSION.SDK_INT > 27) {
+                // on newer versions of Android, use the new decodeBitmap method
+                ImageDecoder.Source source = ImageDecoder.createSource(ctx.getContentResolver(), photoUri);
+                image = ImageDecoder.decodeBitmap(source);
+            } else {
+                // support older versions of Android by using getBitmap
+                image = MediaStore.Images.Media.getBitmap(ctx.getContentResolver(), photoUri);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
 }
 

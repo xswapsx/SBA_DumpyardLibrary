@@ -3,15 +3,13 @@ package com.appynitty.swachbharatabhiyanlibrary.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.hardware.Camera;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -35,7 +33,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.appynitty.retrofitconnectionlibrary.pojos.ResultPojo;
 import com.appynitty.swachbharatabhiyanlibrary.R;
@@ -53,11 +50,9 @@ import com.riaylibrary.utils.LocaleHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Objects;
 
 import io.github.kobakei.materialfabspeeddial.FabSpeedDial;
@@ -564,30 +559,15 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
 
     private void takePhotoImageViewOnClick() {
-//        hideQR();
-
         setContentView(R.layout.layout_blank);
-        /*Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, REQUEST_CAMERA);
-        Camera.open(0);*/
-
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra("android.intent.extras.CAMERA_FACING", 0);
-        /*intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-        intent.putExtra(MediaStore.QUERY_ARG_RELATED_URI, 1);*/
-        startActivityForResult(intent, REQUEST_CAMERA);
+        Intent i = new Intent(EmpQRcodeScannerActivity.this, CameraActivity.class);
+        startActivityForResult(i, REQUEST_CAMERA);
     }
 
     public void handleResult(Result result) {
-//        scannerView.stopCameraPreview();
         Log.e(TAG, "handleResult: " + result.getContents());
         mHouse_id = result.getContents();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-
         takePhotoImageViewOnClick();
-//        }
-//        showActionPopUp(result.getContents());
-//        restartPreview();
     }
 
     private void startPreview() {
@@ -675,12 +655,13 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
         if (requestCode == AUtils.ADD_DETAILS_REQUEST_KEY && resultCode == RESULT_OK) {
             finish();
-        } else if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_CAMERA) {
-//                mCamera = Camera.open(0);
-                onCaptureImageResult(data);
-            }
+        } else if (requestCode == REQUEST_CAMERA) {
+            assert data != null;
+            String message = data.getStringExtra("image_path");
+            Log.e(TAG, "onActivityResult: " + message);
+            onCaptureImageResult(data);
         }
+//        }
 
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -732,164 +713,36 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
     private void onCaptureImageResult(Intent data) {
 
-        Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-        File destination;
-//        requestRead();
-        OutputStream fos;
-        try {
-
-            final File dir;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {  //added by swapnil for android version 10 and above
-
-                ContentResolver resolver = mContext.getContentResolver();
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, System.currentTimeMillis() + ".jpg");
-                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
-                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/" + "Gram Panchayat");
-                Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-                fos = resolver.openOutputStream(imageUri);
-
-                thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                destination = new File(String.valueOf(contentValues), System.currentTimeMillis() + ".jpg");
-
-                fos.flush();
-                fos.close();
-
-            } else {
-
-                /*dir = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DCIM), "Gram Panchayat");
-
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-                destination = new File(dir, System.currentTimeMillis() + ".jpg");
-                fos = new FileOutputStream(destination);
-                thumbnail.compress(Bitmap.CompressFormat.PNG, 500, fos);*/
-
-
-                try {
-
-//changes made
-                    dir = new File(
-                            getExternalFilesDir(null).getAbsolutePath()
-                                    + "/Gram Panchayat");
-
-                    if (!dir.exists()) {
-                        dir.mkdirs();
-                    }
-                    destination = new File(dir, System.currentTimeMillis() + ".jpg");
-
-                    FileOutputStream fOut = new FileOutputStream(destination);
-                    thumbnail.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-
-                } catch (Exception e) {
-
-                    e.printStackTrace();
-                    AUtils.error(mContext, "Unable to add image", Toast.LENGTH_SHORT);
-                }
-            }
-
-            /*fos.flush();
-            fos.close();*/
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            AUtils.error(mContext, "Unable to add image", Toast.LENGTH_SHORT);
-
-        }
-
-        Uri tempUri;
-        String finalPath;
-        tempUri = getImageUri(getApplicationContext(), thumbnail);
-        finalPath = getRealPathFromURI(tempUri);
-        Log.e(TAG, "onCaptureImageResult: imagePath:- " + finalPath);
-        mImagePath = finalPath;
+        String imagePath = data.getStringExtra("image_path");
+        Log.e(TAG, "onCaptureImageResult: imagePath:- " + imagePath);
+        mImagePath = imagePath;
         showActionPopUp(mHouse_id);
-
-        Bitmap bm = BitmapFactory.decodeFile(finalPath);
-
-        Bitmap newBitmap = AUtils.writeOnImage(AUtils.getDateAndTime(), mHouse_id, mImagePath);
-
+        Bitmap bm = BitmapFactory.decodeFile(mImagePath);
+        Bitmap newBitmap = AUtils.writeOnImage(mContext, AUtils.getDateAndTime(), mHouse_id, mImagePath);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // bm is the bitmap object
+        newBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos); // bm is the bitmap object
         byte[] byteArrayImage = baos.toByteArray();
-
-        //Bitmap sizeImage = AUtils.resizeImage(newBitmap, 500,true);
-      /* Bitmap sizeImage = AUtils.getResizedBitmapNew(newBitmap, 300,466);
-        Bitmap shadowImage32 = sizeImage.copy(ARGB_8888, true);*/
         encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
-
-//        encodedImage = BitMapToString(shadowImage32);
-
         Log.d(TAG, "onCaptureImageResult: Base64:- " + encodedImage);
 
     }
 
-    public String BitMapToString(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] b = baos.toByteArray();
-        String temp = null;
+    public Bitmap loadFromUri(Uri photoUri) {
+        Bitmap image = null;
         try {
-            System.gc();
-            temp = Base64.encodeToString(b, Base64.DEFAULT);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } catch (OutOfMemoryError e) {
-            baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-            b = baos.toByteArray();
-            temp = Base64.encodeToString(b, Base64.DEFAULT);
-            Log.e("Memory Loss", "Out of memory error catched");
-        }
-        return temp;
-    }
-
-    /**
-     * Added by swapnil 22-12-21
-     */
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "IMG_" + Calendar.getInstance().getTime(), null);
-        return Uri.parse(path);
-    }
-
-    public String getRealPathFromURI(Uri uri) {
-        String path = "";
-        if (getContentResolver() != null) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            if (cursor != null) {
-                cursor.moveToFirst();
-                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-                path = cursor.getString(idx);
-                cursor.close();
+            // check version of Android on device
+            if (Build.VERSION.SDK_INT > 27) {
+                // on newer versions of Android, use the new decodeBitmap method
+                ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), photoUri);
+                image = ImageDecoder.decodeBitmap(source);
+            } else {
+                // support older versions of Android by using getBitmap
+                image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return path;
-    }
-
-    /**
-     * End of addition
-     */
-
-    /**
-     * requestPermissions and do something
-     */
-    public void requestRead() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-        } else {
-            readFile();
-        }
+        return image;
     }
 
     private void readFile() {

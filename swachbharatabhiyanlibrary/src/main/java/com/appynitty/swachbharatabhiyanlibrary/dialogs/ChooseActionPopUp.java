@@ -1,13 +1,15 @@
 package com.appynitty.swachbharatabhiyanlibrary.dialogs;
 
 
-import static android.graphics.Bitmap.Config.ARGB_8888;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -16,6 +18,9 @@ import android.widget.LinearLayout;
 
 import com.appynitty.swachbharatabhiyanlibrary.R;
 import com.appynitty.swachbharatabhiyanlibrary.utils.AUtils;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ChooseActionPopUp extends Dialog {
 
@@ -28,7 +33,8 @@ public class ChooseActionPopUp extends Dialog {
     private String mId, mPath;
     public static final int SKIP_BUTTON_CLICKED = 0;
     public static final int ADD_DETAILS_BUTTON_CLICKED = 1;
-
+    Context mContext;
+    Uri uri;
     Bitmap bmp = null;
     Bitmap result = null;
     Bitmap result1 = null;
@@ -37,6 +43,7 @@ public class ChooseActionPopUp extends Dialog {
 
     public ChooseActionPopUp(Context context) {
         super(context);
+        mContext = context;
     }
 
     public void setChooseActionPopUpDialogListener(ChooseActionPopUpDialogListener chooseActionPopUpDialogListener) {
@@ -73,10 +80,11 @@ public class ChooseActionPopUp extends Dialog {
 
     private void initData() {
 
-        bmp = AUtils.writeOnImage(AUtils.getDateAndTime(), mId, mPath);
-        Bitmap shadowImage32 = bmp.copy(ARGB_8888, true);
-        ivQR_image.setImageBitmap(shadowImage32);
-
+        if (mPath != null && !mPath.trim().isEmpty()) {
+            uri = Uri.fromFile(new File(mPath));
+            Bitmap btmap = AUtils.writeOnImage(mContext, AUtils.getDateAndTime(), mId, mPath);
+            ivQR_image.setImageBitmap(btmap);
+        }
 
     }
 
@@ -122,32 +130,24 @@ public class ChooseActionPopUp extends Dialog {
 
     }
 
+    public Bitmap loadFromUri(Uri photoUri) {
+        Bitmap image = null;
+        try {
+            // check version of Android on device
+            if (Build.VERSION.SDK_INT > 27) {
+                // on newer versions of Android, use the new decodeBitmap method
+                ImageDecoder.Source source = ImageDecoder.createSource(mContext.getContentResolver(), photoUri);
+                image = ImageDecoder.decodeBitmap(source);
+            } else {
+                // support older versions of Android by using getBitmap
+                image = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), photoUri);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
 
-    /* private void setPic() {
-         // Get the dimensions of the View
-         int targetW = ivQR_image.getWidth();
-         int targetH = ivQR_image.getHeight();
-
-         // Get the dimensions of the bitmap
-         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-         bmOptions.inJustDecodeBounds = true;
-         BitmapFactory.decodeFile(mPath, bmOptions);
-         int photoW = bmOptions.outWidth;
-         int photoH = bmOptions.outHeight;
-
-         // Determine how much to scale down the image
-         int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-
-         // Decode the image file into a Bitmap sized to fill the View
-         bmOptions.inJustDecodeBounds = false;
-         bmOptions.inSampleSize = scaleFactor;
-         bmOptions.inPurgeable = true;
-
-         //Bitmap bmp = AUtils.writeOnImage(AUtils.getDateAndTime(), mId, mPath);
-         Bitmap bitmap = BitmapFactory.decodeFile(mPath, bmOptions);
-         ivQR_image.setImageBitmap(bitmap);
-     }
- */
     private void dismissPopup() {
         this.dismiss();
     }
