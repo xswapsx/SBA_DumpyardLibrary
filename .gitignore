@@ -37,6 +37,7 @@ SBA_Library\.idea/libraries
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
 *.iml
+SBA_Library/
 
 # OS-specific files
 .DS_Store

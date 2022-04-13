@@ -160,8 +160,8 @@ public class CameraActivity extends AppCompatActivity {
                         .getOutputSizes(ImageFormat.JPEG);
 
             //Capture image with custom size
-            int width = 900;    //1280*1707 720*960
-            int height = 800;
+            int width = 640;    //1280*1707 720*960  640*480
+            int height = 480;
             /*if (jpegSizes != null && jpegSizes.length > 0) {
                 width = jpegSizes[0].getWidth();
                 height = jpegSizes[0].getHeight();
@@ -260,6 +260,7 @@ public class CameraActivity extends AppCompatActivity {
             texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
             Surface surface = new Surface(texture);
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            captureRequestBuilder.set(CaptureRequest.JPEG_QUALITY, (byte) 10);
             captureRequestBuilder.addTarget(surface);
             cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
                 @Override
