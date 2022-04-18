@@ -669,7 +669,11 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
             assert data != null;
             String message = data.getStringExtra("image_path");
             Log.e(TAG, "onActivityResult: " + message);
-            onCaptureImageResult(data);
+            try {
+                onCaptureImageResult(data);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 //        }
 
@@ -721,22 +725,41 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         finish();
     }
 
-    private void onCaptureImageResult(Intent data) {
+    private void onCaptureImageResult(Intent data) throws IOException {
 
         String imagePath = data.getStringExtra("image_path");
         String compressedImagePath = compressImage(imagePath); // important code for compressing an image
 
         Log.e(TAG, "onCaptureImageResult: compressedImagePath:- " + compressedImagePath);
-        mImagePath = imagePath;
+        mImagePath = compressedImagePath;
         showActionPopUp(mHouse_id);
         Bitmap bm = BitmapFactory.decodeFile(mImagePath);
         Bitmap newBitmap = AUtils.writeOnImage(mContext, AUtils.getDateAndTime(), mHouse_id, mImagePath);
+
+        Uri uri = getImageUri(mContext, newBitmap);
+        String str = getRealPathFromURI(String.valueOf(uri));
+        compressedImagePath = compressImage(str);
+
+        Log.e(TAG, "onCaptureImageResult: realPath: " + str);
+        newBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.fromFile(new File(compressedImagePath)));
+
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        newBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos); // bm is the bitmap object
+        newBitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos); // bm is the bitmap object
         byte[] byteArrayImage = baos.toByteArray();
+        long lengthbmp = byteArrayImage.length;
+        Log.e(TAG, "onCaptureImageResult: Final-size: " + lengthbmp);
+
         encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
         Log.d(TAG, "onCaptureImageResult: Base64:- " + encodedImage);
 
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
     public Bitmap loadFromUri(Uri photoUri) {
