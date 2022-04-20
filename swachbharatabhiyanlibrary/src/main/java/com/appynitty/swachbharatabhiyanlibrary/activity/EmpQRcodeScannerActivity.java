@@ -736,6 +736,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         Bitmap bm = BitmapFactory.decodeFile(mImagePath);
         Bitmap newBitmap = AUtils.writeOnImage(mContext, AUtils.getDateAndTime(), mHouse_id, mImagePath);
 
+
         Uri uri = getImageUri(mContext, newBitmap);
         String str = getRealPathFromURI(String.valueOf(uri));
         compressedImagePath = compressImage(str);
@@ -755,11 +756,26 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
     }
 
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    public Uri getImageUri(Context inContext, Bitmap inImage) throws IOException {
+        /*ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
+        return Uri.parse(path);*/
+
+        File tempDir = Environment.getExternalStorageDirectory();
+        tempDir = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES) + "/.temp/");
+        tempDir.mkdir();
+        File tempFile = File.createTempFile("tmp_" + System.currentTimeMillis(), ".jpg", tempDir);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 60, bytes);
+        byte[] bitmapData = bytes.toByteArray();
+
+        //write the bytes in file
+        FileOutputStream fos = new FileOutputStream(tempFile);
+        fos.write(bitmapData);
+        fos.flush();
+        fos.close();
+        return Uri.fromFile(tempFile);
     }
 
     public Bitmap loadFromUri(Uri photoUri) {

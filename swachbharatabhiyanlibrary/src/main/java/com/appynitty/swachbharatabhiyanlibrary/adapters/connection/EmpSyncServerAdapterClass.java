@@ -27,8 +27,9 @@ import retrofit2.Response;
  */
 public class EmpSyncServerAdapterClass {
 
+    private static final String TAG = "EmpSyncServerAdapterClass";
     EmpSyncServerAdapterClass.EmpSyncOfflineListener empSyncOfflineListener;
-
+    int offlineCount = 0;
     private final List<QrLocationPojo> locationPojoList;
     private final Gson gson;
     private final EmpSyncServerRepository empSyncServerRepository;
@@ -44,57 +45,72 @@ public class EmpSyncServerAdapterClass {
     }
 
     public void syncServer() {
-        if (!AUtils.isEmpSyncServerRequestEnable) {
 
-            getDatabaseList();
+        offlineCount = empSyncServerRepository.getOfflineCount();
 
-            if (locationPojoList.size() > 0) {
 
-                AUtils.isEmpSyncServerRequestEnable = true;
+//        do {
 
-                Collections.reverse(locationPojoList);
+        for (int i = 0; i < offlineCount; i++) {
 
-                QrLocationWebService service = Connection.createService(QrLocationWebService.class, AUtils.SERVER_URL);
 
-                service.saveQrLocationDetailsOffline(Prefs.getString(AUtils.APP_ID, ""), AUtils.CONTENT_TYPE, locationPojoList).enqueue(new Callback<List<OfflineGcResultPojo>>() {
-                    @Override
-                    public void onResponse(Call<List<OfflineGcResultPojo>> call, Response<List<OfflineGcResultPojo>> response) {
+            if (!AUtils.isEmpSyncServerRequestEnable) {
 
-                        if (response.code() == 200) {
-                            onResponseReceived(response.body());
-                            if (locationPojoList.size() > 0) {
+
+                getDatabaseList();
+
+                Log.e(TAG, "syncServer: Sending " + locationPojoList.size() + " data packets!");
+                if (locationPojoList.size() > 0) {
+
+                    Log.e(TAG, "syncServer: offlineDataCount: " + empSyncServerRepository.getOfflineCount());
+
+                    AUtils.isEmpSyncServerRequestEnable = true;
+
+                    Collections.reverse(locationPojoList);
+
+                    QrLocationWebService service = Connection.createService(QrLocationWebService.class, AUtils.SERVER_URL);
+
+                    service.saveQrLocationDetailsOffline(Prefs.getString(AUtils.APP_ID, ""), AUtils.CONTENT_TYPE, locationPojoList).enqueue(new Callback<List<OfflineGcResultPojo>>() {
+                        @Override
+                        public void onResponse(Call<List<OfflineGcResultPojo>> call, Response<List<OfflineGcResultPojo>> response) {
+
+                            if (response.code() == 200) {
+                                onResponseReceived(response.body());
+                                if (locationPojoList.size() > 0) {
+
+                                } else {
+                                    empSyncOfflineListener.onSuccessCallback();
+                                }
 
                             } else {
-                                empSyncOfflineListener.onSuccessCallback();
+                                Log.i(AUtils.TAG_HTTP_RESPONSE, "onFailureCallback: Response Code-" + response.code());
+                                AUtils.isEmpSyncServerRequestEnable = false;
+                                empSyncOfflineListener.onFailureCallback();
                             }
-
-                        } else {
-                            Log.i(AUtils.TAG_HTTP_RESPONSE, "onFailureCallback: Response Code-" + response.code());
-                            AUtils.isEmpSyncServerRequestEnable = false;
-                            empSyncOfflineListener.onFailureCallback();
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<List<OfflineGcResultPojo>> call, Throwable t) {
-                        Log.i(AUtils.TAG_HTTP_RESPONSE, "onFailureCallback: Response Code-" + t.getMessage());
-                        AUtils.isEmpSyncServerRequestEnable = false;
-                        empSyncOfflineListener.onErrorCallback();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<List<OfflineGcResultPojo>> call, Throwable t) {
+                            Log.i(AUtils.TAG_HTTP_RESPONSE, "onFailureCallback: Response Code-" + t.getMessage());
+                            AUtils.isEmpSyncServerRequestEnable = false;
+                            empSyncOfflineListener.onErrorCallback();
+                        }
+                    });
+                } else {
+                    if (empSyncOfflineListener != null)
+                        empSyncOfflineListener.onSuccessCallback();
+                }
             } else {
                 if (empSyncOfflineListener != null)
-                    empSyncOfflineListener.onSuccessCallback();
+                    empSyncOfflineListener.onFailureCallback();
             }
-        } else {
-            if (empSyncOfflineListener != null)
-                empSyncOfflineListener.onFailureCallback();
         }
+//        } while (offlineCount > 0);
     }
 
     private void getDatabaseList() {
 
-        List<EmpSyncServerEntity> entityList = empSyncServerRepository.getAllEmpSyncServerEntity();
+        List<EmpSyncServerEntity> entityList = empSyncServerRepository.get10EmpSyncServerEntity();
         locationPojoList.clear();
         for (EmpSyncServerEntity entity : entityList) {
             Type type = new TypeToken<QrLocationPojo>() {
@@ -140,7 +156,7 @@ public class EmpSyncServerAdapterClass {
             }
         }
         AUtils.isEmpSyncServerRequestEnable = false;
-
+        offlineCount = empSyncServerRepository.getOfflineCount();
 
     }
 

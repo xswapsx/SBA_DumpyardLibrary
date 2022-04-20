@@ -779,7 +779,7 @@ public class AUtils extends CommonUtils {
         int xPos = (canvas.getWidth() / 2);
         int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2));
 
-        canvas.drawText("ID: " + mId, 25, yPos + 230, stkPaint);
+        canvas.drawText("ID: " + mId, 25, yPos + 230, stkPaint);    //difference of 25
         canvas.drawText("ID: " + mId, 25, yPos + 230, paint);
         canvas.drawText("Lat: " + lat, 25, yPos + 255, stkPaint);
         canvas.drawText("Lat: " + lat, 25, yPos + 255, paint);

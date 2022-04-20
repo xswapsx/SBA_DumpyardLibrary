@@ -107,6 +107,7 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
 
         List<EmpSyncServerEntity> entityList = empSyncServerRepository.getAllEmpSyncServerEntity();
         locationPojoList.clear();
+        clearCount();
         for (EmpSyncServerEntity entity : entityList) {
             Type type = new TypeToken<QrLocationPojo>() {
             }.getType();
@@ -206,6 +207,7 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
             layoutNoOfflineData.setVisibility(View.GONE);
 
             EmpInflateOfflineHistoryAdapter historyAdapter = new EmpInflateOfflineHistoryAdapter(mContext, R.layout.layout_history_card, countList);
+            historyAdapter.setNotifyOnChange(true);
             gridOfflineData.setAdapter(historyAdapter);
         } else {
             gridOfflineData.setVisibility(View.GONE);
@@ -223,6 +225,13 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
         } else {
             AUtils.showSnackBar(findViewById(R.id.parent));
         }
+    }
+
+    public void clearCount() {
+        houseCount = 0;
+        dyCount = 0;
+        ssCount = 0;
+        lwcCount = 0;
     }
 
     @Override
