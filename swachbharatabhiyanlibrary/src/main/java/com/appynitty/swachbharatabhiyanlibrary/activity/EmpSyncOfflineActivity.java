@@ -51,7 +51,7 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
     private Gson gson;
     private AlertDialog alertDialog;
     private int houseCount, dyCount, ssCount, lwcCount;
-
+    EmpInflateOfflineHistoryAdapter historyAdapter;
     List<EmpOfflineCollectionCount> countList;
 
     @Override
@@ -105,6 +105,7 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
 
     private void getDatabaseList() {
 
+        clearCount();
         List<EmpSyncServerEntity> entityList = empSyncServerRepository.getAllEmpSyncServerEntity();
         locationPojoList.clear();
         clearCount();
@@ -149,6 +150,7 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
 
     }
 
+
     private void registerEvents() {
 
         final EmpSyncServerAdapterClass empSyncAdapter = new EmpSyncServerAdapterClass();
@@ -169,6 +171,9 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
                             alertDialog.hide();
                         AUtils.success(mContext, getString(R.string.success_offline_sync), Toast.LENGTH_LONG);
                         locationPojoList.clear();
+                        countList.clear();
+                        getDatabaseList();
+                        historyAdapter.setNotifyOnChange(true);
                         inflateData();
                     }
 
@@ -206,8 +211,8 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
             btnSyncOfflineData.setVisibility(View.VISIBLE);
             layoutNoOfflineData.setVisibility(View.GONE);
 
-            EmpInflateOfflineHistoryAdapter historyAdapter = new EmpInflateOfflineHistoryAdapter(mContext, R.layout.layout_history_card, countList);
-            historyAdapter.setNotifyOnChange(true);
+            historyAdapter = new EmpInflateOfflineHistoryAdapter(mContext, R.layout.layout_history_card, countList);
+//            historyAdapter.setNotifyOnChange(true);
             gridOfflineData.setAdapter(historyAdapter);
         } else {
             gridOfflineData.setVisibility(View.GONE);
