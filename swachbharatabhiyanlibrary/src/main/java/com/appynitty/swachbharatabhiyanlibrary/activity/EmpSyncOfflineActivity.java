@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 
 import com.appynitty.swachbharatabhiyanlibrary.R;
 import com.appynitty.swachbharatabhiyanlibrary.adapters.UI.EmpInflateOfflineHistoryAdapter;
@@ -44,6 +45,7 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
     private Context mContext;
     private LinearLayout layoutNoOfflineData;
     private Button btnSyncOfflineData;
+    CardView uploadDialog;
     private GridView gridOfflineData;
 
     private EmpSyncServerRepository empSyncServerRepository;
@@ -87,6 +89,7 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
 
         layoutNoOfflineData = findViewById(R.id.show_error_offline_data);
         btnSyncOfflineData = findViewById(R.id.btn_sync_data);
+        uploadDialog = findViewById(R.id.upload_progressBar);
         gridOfflineData = findViewById(R.id.grid_offline_data);
         alertDialog = AUtils.getUploadingAlertDialog(mContext);
 
@@ -157,18 +160,13 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
         btnSyncOfflineData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (!alertDialog.isShowing())
-                    alertDialog.show();
-
+                uploadDialog.setVisibility(View.VISIBLE);
                 empSyncAdapter.syncServer();
 
                 empSyncAdapter.setSyncOfflineListener(new EmpSyncServerAdapterClass.EmpSyncOfflineListener() {
                     @Override
                     public void onSuccessCallback() {
-
-                        if (alertDialog.isShowing())
-                            alertDialog.hide();
+                        uploadDialog.setVisibility(View.GONE);
                         AUtils.success(mContext, getString(R.string.success_offline_sync), Toast.LENGTH_LONG);
                         locationPojoList.clear();
                         countList.clear();
@@ -179,15 +177,13 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailureCallback() {
-                        if (alertDialog.isShowing())
-                            alertDialog.hide();
+                        uploadDialog.setVisibility(View.GONE);
                         AUtils.warning(mContext, getResources().getString(R.string.try_after_sometime));
                     }
 
                     @Override
                     public void onErrorCallback() {
-                        if (alertDialog.isShowing())
-                            alertDialog.hide();
+                        uploadDialog.setVisibility(View.GONE);
                         AUtils.warning(mContext, getResources().getString(R.string.serverError));
                     }
                 });
