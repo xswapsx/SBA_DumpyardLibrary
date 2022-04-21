@@ -156,44 +156,48 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
 
     private void registerEvents() {
 
-        final EmpSyncServerAdapterClass empSyncAdapter = new EmpSyncServerAdapterClass();
         btnSyncOfflineData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                uploadDialog.setVisibility(View.VISIBLE);
-                empSyncAdapter.syncServer();
-
-                empSyncAdapter.setSyncOfflineListener(new EmpSyncServerAdapterClass.EmpSyncOfflineListener() {
-                    @Override
-                    public void onSuccessCallback() {
-                        uploadDialog.setVisibility(View.GONE);
-                        AUtils.success(mContext, getString(R.string.success_offline_sync), Toast.LENGTH_LONG);
-                        locationPojoList.clear();
-                        countList.clear();
-                        getDatabaseList();
-                        historyAdapter.setNotifyOnChange(true);
-                        inflateData();
-                    }
-
-                    @Override
-                    public void onFailureCallback() {
-                        uploadDialog.setVisibility(View.GONE);
-                        AUtils.warning(mContext, getResources().getString(R.string.try_after_sometime));
-                    }
-
-                    @Override
-                    public void onErrorCallback() {
-                        uploadDialog.setVisibility(View.GONE);
-                        AUtils.warning(mContext, getResources().getString(R.string.serverError));
-                    }
-                });
-
-                ShareLocationAdapterClass shareLocationAdapterClass = new ShareLocationAdapterClass();
-                shareLocationAdapterClass.shareLocation();
+                uploadToServer();
             }
         });
 
 
+    }
+
+    private void uploadToServer() {
+        final EmpSyncServerAdapterClass empSyncAdapter = new EmpSyncServerAdapterClass();
+        uploadDialog.setVisibility(View.VISIBLE);
+        empSyncAdapter.syncServer();
+
+        empSyncAdapter.setSyncOfflineListener(new EmpSyncServerAdapterClass.EmpSyncOfflineListener() {
+            @Override
+            public void onSuccessCallback() {
+                uploadDialog.setVisibility(View.GONE);
+                AUtils.success(mContext, getString(R.string.success_offline_sync), Toast.LENGTH_LONG);
+                locationPojoList.clear();
+                countList.clear();
+                getDatabaseList();
+                historyAdapter.setNotifyOnChange(true);
+                inflateData();
+            }
+
+            @Override
+            public void onFailureCallback() {
+                uploadDialog.setVisibility(View.GONE);
+                AUtils.warning(mContext, getResources().getString(R.string.try_after_sometime));
+            }
+
+            @Override
+            public void onErrorCallback() {
+                uploadDialog.setVisibility(View.GONE);
+                AUtils.warning(mContext, getResources().getString(R.string.serverError));
+            }
+        });
+
+        ShareLocationAdapterClass shareLocationAdapterClass = new ShareLocationAdapterClass();
+        shareLocationAdapterClass.shareLocation();
     }
 
     private void initData() {
@@ -223,6 +227,10 @@ public class EmpSyncOfflineActivity extends AppCompatActivity {
         super.onPostResume();
         if (AUtils.isInternetAvailable()) {
             AUtils.hideSnackBar();
+            if (empSyncServerRepository.getOfflineCount() > 0) {
+                uploadToServer();
+            }
+
         } else {
             AUtils.showSnackBar(findViewById(R.id.parent));
         }
