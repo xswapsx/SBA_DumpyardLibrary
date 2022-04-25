@@ -762,8 +762,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);*/
 
-        File tempDir = Environment.getExternalStorageDirectory();
-        tempDir = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES) + "/.temp/");
+        File tempDir = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_PICTURES) + "/.temp/");
         tempDir.mkdir();
         File tempFile = File.createTempFile("tmp_" + System.currentTimeMillis(), ".jpg", tempDir);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -799,7 +798,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
     public String compressImage(String imageUri) {
 
-        String filePath = getRealPathFromURI(imageUri);
+        String filePath = imageUri;
         Bitmap scaledBitmap = null;
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -901,7 +900,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         }
 
         FileOutputStream out = null;
-        String filename = getFilename();
+        String filename = imageUri;
         try {
             out = new FileOutputStream(filename);
 
