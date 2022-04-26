@@ -813,8 +813,13 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
 //      max Height and width values of the compressed image is taken as 816x612
 
-        float maxHeight = 816.0f;
-        float maxWidth = 612.0f;
+        /*float maxHeight = 816.0f;
+        float maxWidth = 612.0f;*/
+
+        float maxHeight = 800.0f;
+        float maxWidth = 640.0f;
+        int bounding = dpToPx(250);
+        Log.i("Test", "bounding = " + Integer.toString(bounding));
         float imgRatio = actualWidth / actualHeight;
         float maxRatio = maxWidth / maxHeight;
 
@@ -956,11 +961,15 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         return inSampleSize;
     }
 
+    private int dpToPx(int dp) {
+        float density = getApplicationContext().getResources().getDisplayMetrics().density;
+        return Math.round((float)dp * density);
+    }
+
 
     private void readFile() {
 
         Log.e(TAG, "readFile: reading the photo file");
     }
-
 
 }
