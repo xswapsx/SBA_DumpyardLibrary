@@ -26,6 +26,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -748,6 +749,10 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         newBitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos); // bm is the bitmap object
         byte[] byteArrayImage = baos.toByteArray();
+
+        // dpi set by rahul
+        setDpi(byteArrayImage, 160);
+
         long lengthbmp = byteArrayImage.length;
         Log.e(TAG, "onCaptureImageResult: Final-size: " + lengthbmp);
 
@@ -815,9 +820,16 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
         /*float maxHeight = 816.0f;
         float maxWidth = 612.0f;*/
+/*
+* added by rahul to dim image size
+* //1020*807 720*1080  or 770 * 1024
+* */
+        /*float maxHeight = 800.0f;
+        float maxWidth = 640.0f;*/
 
-        float maxHeight = 800.0f;
-        float maxWidth = 640.0f;
+        float maxHeight = 1280.0f;
+        float maxWidth = 1707.0f;
+
         int bounding = dpToPx(250);
         Log.i("Test", "bounding = " + Integer.toString(bounding));
         float imgRatio = actualWidth / actualHeight;
@@ -970,6 +982,84 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
     private void readFile() {
 
         Log.e(TAG, "readFile: reading the photo file");
+    }
+
+    public int setDpi(byte[] imageData, int dpi) {
+        imageData[13] = 1;
+        imageData[14] = (byte) (dpi >> 8);
+        imageData[15] = (byte) (dpi & 0xff);
+        imageData[16] = (byte) (dpi >> 8);
+        imageData[17] = (byte) (dpi & 0xff);
+
+        /*DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int dpiClassification = dm.densityDpi;
+        float xDpi = dm.xdpi;
+        float yDpi = dm.ydpi;*/
+        return dpi;
+    }
+
+    public int dpToPxx(int dp) {
+        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
+    public static String getScreenDensity(Context context)
+    {
+        String density;
+        switch (context.getResources().getDisplayMetrics().densityDpi)
+        {
+            case DisplayMetrics.DENSITY_LOW:
+                density = "LDPI";
+                break;
+            case DisplayMetrics.DENSITY_140:
+                density = "LDPI - MDPI";
+                break;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                density = "MDPI";
+                break;
+            case DisplayMetrics.DENSITY_180:
+            case DisplayMetrics.DENSITY_200:
+            case DisplayMetrics.DENSITY_220:
+                density = "MDPI - HDPI";
+                break;
+            case DisplayMetrics.DENSITY_HIGH:
+                density = "HDPI";
+                break;
+            case DisplayMetrics.DENSITY_260:
+            case DisplayMetrics.DENSITY_280:
+            case DisplayMetrics.DENSITY_300:
+                density = "HDPI - XHDPI";
+                break;
+            case DisplayMetrics.DENSITY_XHIGH:
+                density = "XHDPI";
+                break;
+            case DisplayMetrics.DENSITY_340:
+            case DisplayMetrics.DENSITY_360:
+            case DisplayMetrics.DENSITY_400:
+            case DisplayMetrics.DENSITY_420:
+            case DisplayMetrics.DENSITY_440:
+                density = "XHDPI - XXHDPI";
+                break;
+            case DisplayMetrics.DENSITY_XXHIGH:
+                density = "XXHDPI";
+                break;
+            case DisplayMetrics.DENSITY_560:
+            case DisplayMetrics.DENSITY_600:
+                density = "XXHDPI - XXXHDPI";
+                break;
+            case DisplayMetrics.DENSITY_XXXHIGH:
+                density = "XXXHDPI";
+                break;
+            case DisplayMetrics.DENSITY_TV:
+                density = "TVDPI";
+                break;
+            default:
+                density = "UNKNOWN";
+                break;
+        }
+
+        return density;
     }
 
 }

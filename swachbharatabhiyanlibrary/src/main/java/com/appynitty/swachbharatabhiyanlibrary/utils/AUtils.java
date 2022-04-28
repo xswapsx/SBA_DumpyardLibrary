@@ -18,6 +18,7 @@ import android.os.Build;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -762,7 +763,7 @@ public class AUtils extends CommonUtils {
         Typeface bold = Typeface.create(plain, Typeface.NORMAL);
         paint.setTypeface(bold);
         paint.setColor(Color.WHITE);
-        paint.setTextSize(25);
+        paint.setTextSize(50);
 
 
         Paint stkPaint = new Paint();
@@ -771,7 +772,7 @@ public class AUtils extends CommonUtils {
         stkPaint.setStrokeWidth(4);
         stkPaint.setColor(Color.BLACK);
         stkPaint.setTypeface(bold);
-        stkPaint.setTextSize(25);
+        stkPaint.setTextSize(50);
 
 
         Canvas canvas = new Canvas(mutableBitmap);
@@ -779,14 +780,23 @@ public class AUtils extends CommonUtils {
         int xPos = (canvas.getWidth() / 2);
         int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2));
 
-        canvas.drawText("ID: " + mId, 25, yPos + 230, stkPaint);    //difference of 25
+        /*canvas.drawText("ID: " + mId, 25, yPos + 230, stkPaint);    //difference of 25
         canvas.drawText("ID: " + mId, 25, yPos + 230, paint);
         canvas.drawText("Lat: " + lat, 25, yPos + 255, stkPaint);
         canvas.drawText("Lat: " + lat, 25, yPos + 255, paint);
         canvas.drawText("Long: " + lon, 25, yPos + 280, stkPaint);
         canvas.drawText("Long: " + lon, 25, yPos + 280, paint);
         canvas.drawText(mDate, 25, yPos + 305, stkPaint);
-        canvas.drawText(mDate, 25, yPos + 305, paint);
+        canvas.drawText(mDate, 25, yPos + 305, paint);*/
+
+        canvas.drawText("ID: " + mId, 26, yPos + 340, stkPaint);    //difference of 40
+        canvas.drawText("ID: " + mId, 25, yPos + 340, paint);
+        canvas.drawText("Lat: " + lat, 28, yPos + 380, stkPaint);
+        canvas.drawText("Lat: " + lat, 27, yPos + 380, paint);
+        canvas.drawText("Long: " + lon, 30, yPos + 420, stkPaint);
+        canvas.drawText("Long: " + lon, 29, yPos + 420, paint);
+        canvas.drawText(mDate, 32, yPos + 460, stkPaint);
+        canvas.drawText(mDate, 31, yPos + 460, paint);
 
 
         return mutableBitmap;
@@ -797,7 +807,7 @@ public class AUtils extends CommonUtils {
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);
 
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm", Locale.getDefault());
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy hh:mm aa", Locale.getDefault());
         String formattedDate = df.format(c);
 
         return formattedDate;
@@ -933,6 +943,26 @@ public class AUtils extends CommonUtils {
         BitmapFactory.Options outOptions = new BitmapFactory.Options();
         outOptions.inSampleSize = scale;
         return BitmapFactory.decodeFile(path, outOptions);
+    }
+
+    // added by rahul
+
+    public static float dpFromPx(final Context context, final float px) {
+        return px / context.getResources().getDisplayMetrics().density;
+    }
+
+    public static float pxFromDp(final Context context, final float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
+    }
+
+    public static float convertDpToPixel(float dp, Context context){
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / displayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static float convertPixelsToDp(float px, Context context){
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        return px / ((float) context.getResources().getDisplayMetrics().densityDpi / displayMetrics.DENSITY_DEFAULT);
     }
 
 }
