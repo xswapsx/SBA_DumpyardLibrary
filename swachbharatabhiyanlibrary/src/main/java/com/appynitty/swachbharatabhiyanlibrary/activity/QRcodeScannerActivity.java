@@ -1113,6 +1113,7 @@ public class QRcodeScannerActivity extends AppCompatActivity implements ZBarScan
             garbageCollectionPojo.setComment(imagePojo.getComment());
             garbageCollectionPojo.setImage1(imagePojo.getImage1());
             garbageCollectionPojo.setImage2(imagePojo.getImage2());
+            garbageCollectionPojo.setGpBeforImageTime("2022-05-04 15:32:24.038");
         }
 
 
@@ -1187,7 +1188,12 @@ public class QRcodeScannerActivity extends AppCompatActivity implements ZBarScan
                 if (imagePojo.getImage1() != null && imagePojo.getImage2() != null) {
                     entity.setGpBeforImage(AUtils.getEncodedImage(imagePojo.getImage1(), this));
                     entity.setGpAfterImage(AUtils.getEncodedImage(imagePojo.getImage2(), this));
+                    entity.setGpBeforImageTime(Prefs.getString(AUtils.BEFORE_IMAGE_TIME, null));
                     Log.e(TAG, "Images are there!");
+                } else if (!Prefs.getString(AUtils.BEFORE_IMAGE, null).isEmpty() || !AUtils.isNullString(Prefs.getString(AUtils.BEFORE_IMAGE, null))) {
+                    entity.setGpBeforImage(AUtils.getEncodedImage(Prefs.getString(AUtils.BEFORE_IMAGE, null), this));
+                    entity.setGpAfterImage(AUtils.getEncodedImage(Prefs.getString(AUtils.AFTER_IMAGE, null), this));
+                    entity.setGpBeforImageTime(Prefs.getString(AUtils.BEFORE_IMAGE_TIME, null));
                 } else {
                     entity.setGpBeforImage("");
                     entity.setGpAfterImage("");

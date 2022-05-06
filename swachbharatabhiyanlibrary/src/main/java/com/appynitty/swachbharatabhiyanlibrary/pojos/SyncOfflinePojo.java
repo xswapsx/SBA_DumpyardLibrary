@@ -25,8 +25,17 @@ public class SyncOfflinePojo {
     private String empType;         //added by swapnil
 
     private String gpBeforImage;
+    private String gpBeforImageTime;
     private String gpAfterImage;
 
+
+    public String getGpBeforImageTime() {
+        return gpBeforImageTime;
+    }
+
+    public void setGpBeforImageTime(String gpBeforImageTime) {
+        this.gpBeforImageTime = gpBeforImageTime;
+    }
 
     public String getEmpType() {
         return empType;

@@ -35,7 +35,24 @@ public class OfflineGarbageColectionPojo {
     private Boolean isOffline;
 
     private String gpBeforImage;
+    private String gpBeforImageTime;
     private String gpAfterImage;
+
+    public Boolean getOffline() {
+        return isOffline;
+    }
+
+    public void setOffline(Boolean offline) {
+        isOffline = offline;
+    }
+
+    public String getGpBeforImageTime() {
+        return gpBeforImageTime;
+    }
+
+    public void setGpBeforImageTime(String gpBeforImageTime) {
+        this.gpBeforImageTime = gpBeforImageTime;
+    }
 
     public String getGpBeforImage() {
         return gpBeforImage;

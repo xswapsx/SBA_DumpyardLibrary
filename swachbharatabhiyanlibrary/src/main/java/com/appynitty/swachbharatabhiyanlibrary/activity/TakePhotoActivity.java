@@ -436,6 +436,7 @@ public class TakePhotoActivity extends AppCompatActivity {
                 beforeImageFilePath = finalPath; //setting image1 path that will be set in imageDTO.
 
                 Prefs.putString(AUtils.BEFORE_IMAGE, beforeImageFilePath);
+                Prefs.putString(AUtils.BEFORE_IMAGE_TIME, AUtils.getServerDateTimeLocal());
                 break;
             case 2:
                 /*afterImage.setImageBitmap(thumbnail);

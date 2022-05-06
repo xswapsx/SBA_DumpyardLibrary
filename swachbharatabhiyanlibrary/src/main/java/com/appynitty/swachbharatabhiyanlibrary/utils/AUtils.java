@@ -71,6 +71,7 @@ public class AUtils extends CommonUtils {
     //    Staging URL
 //    public static final String SERVER_URL = "http://115.115.153.117:4044/";
 //    public static final String SERVER_URL = "http://202.65.157.254:6560";
+//    public static final String SERVER_URL = "http://183.177.126.33:6560/";
 
     //Relese URL
 //    public static final String SERVER_URL = "https://ghantagadi.in:444/";
@@ -163,6 +164,7 @@ public class AUtils extends CommonUtils {
     public static final String QR_TABLE_NAME = "table_qr_emp";
 
     public static final String BEFORE_IMAGE = "imageB";
+    public static final String BEFORE_IMAGE_TIME = "b4ImageTime";
     public static final String AFTER_IMAGE = "imageA";
     public static final String QR_IMAGE_PATH = "qr_image_path";
 

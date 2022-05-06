@@ -9,6 +9,7 @@ public class GarbageCollectionPojo {
     private String AfterImage;
 
     private String beforeImage;
+    private String gpBeforImageTime;
 
     private String id;
 
@@ -25,6 +26,15 @@ public class GarbageCollectionPojo {
     private double distance;
 
     private String gcType;
+
+
+    public String getGpBeforImageTime() {
+        return gpBeforImageTime;
+    }
+
+    public void setGpBeforImageTime(String gpBeforImageTime) {
+        this.gpBeforImageTime = gpBeforImageTime;
+    }
 
     public String getGcType() {
         return gcType;
