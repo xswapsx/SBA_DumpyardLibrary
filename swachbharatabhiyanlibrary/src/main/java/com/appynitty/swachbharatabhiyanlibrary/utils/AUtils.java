@@ -66,7 +66,12 @@ public class AUtils extends CommonUtils {
 //    public static final String SERVER_URL = "http://192.168.200.3:6560/";
 
     //  Advanced Ghanta Gadi Live URL
-    public static final String SERVER_URL = "http://202.65.157.253:6560";
+   // public static final String SERVER_URL = "http://202.65.157.253:6560";
+
+    /***
+     * Staging port
+     * */
+    public static final String SERVER_URL = "https://ictsbm.com:30443";
 
     //    Staging URL
 //    public static final String SERVER_URL = "http://115.115.153.117:4044/";
