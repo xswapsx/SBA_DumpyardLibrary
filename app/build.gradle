@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 30
     defaultConfig {
-        applicationId "com.appynitty.swachbharatabhiyan"
+        applicationId "com.appynitty.sba_dumplib"
         minSdkVersion 23
         targetSdkVersion 30
         //for vengurla 4 version

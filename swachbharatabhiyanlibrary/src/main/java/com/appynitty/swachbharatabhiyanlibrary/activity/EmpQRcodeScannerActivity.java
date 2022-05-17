@@ -207,7 +207,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
     @Override
     protected void onResume() {
         super.onResume();
-        startPreview();
+//        startPreview();
     }
 
     @Override
@@ -496,11 +496,16 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
     private Boolean validSubmitId(String id) {
 
         Log.e(TAG, "validSubmitId: " + id);
-        return id.substring(0, 2).matches("^[HhPp]+$")
-                || id.matches("gpsba[0-9]+$")
-                || id.matches("lwsba[0-9]+$")
-                || id.matches("sssba[0-9]+$")
-                || id.matches("dysba[0-9]+$");
+        if (Prefs.getBoolean(AUtils.PREFS.IS_SAME_LOCALITY, false)) {
+            return id.substring(0, 2).matches("^[HhPp]+$")
+                    || id.matches("gpsba[0-9]+$")
+                    || id.matches("lwsba[0-9]+$")
+                    || id.matches("sssba[0-9]+$")
+                    || id.matches("dysba[0-9]+$");
+        } else {
+            return false;
+        }
+
     }
 
     private void checkCameraPermission() {
@@ -570,7 +575,10 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
 
     private void takePhotoImageViewOnClick() {
-        setContentView(R.layout.layout_blank);
+//        setContentView(R.layout.layout_blank);
+//        stopPreview();
+        scannerView.stopCamera();
+//        scannerView.stopCameraPreview();
         Intent i = new Intent(EmpQRcodeScannerActivity.this, CameraActivity.class);
         startActivityForResult(i, REQUEST_CAMERA);
     }
@@ -820,10 +828,10 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
         /*float maxHeight = 816.0f;
         float maxWidth = 612.0f;*/
-/*
-* added by rahul to dim image size
-* //1020*807 720*1080  or 770 * 1024
-* */
+        /*
+         * added by rahul to dim image size
+         * //1020*807 720*1080  or 770 * 1024
+         * */
         /*float maxHeight = 800.0f;
         float maxWidth = 640.0f;*/
 
@@ -975,7 +983,7 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
 
     private int dpToPx(int dp) {
         float density = getApplicationContext().getResources().getDisplayMetrics().density;
-        return Math.round((float)dp * density);
+        return Math.round((float) dp * density);
     }
 
 
@@ -1004,11 +1012,9 @@ public class EmpQRcodeScannerActivity extends AppCompatActivity implements ZBarS
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
-    public static String getScreenDensity(Context context)
-    {
+    public static String getScreenDensity(Context context) {
         String density;
-        switch (context.getResources().getDisplayMetrics().densityDpi)
-        {
+        switch (context.getResources().getDisplayMetrics().densityDpi) {
             case DisplayMetrics.DENSITY_LOW:
                 density = "LDPI";
                 break;

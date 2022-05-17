@@ -675,6 +675,8 @@ public class QRcodeScannerActivity extends AppCompatActivity implements ZBarScan
                 isActivityData = true;
             }
         }
+
+//        Prefs.putString(AUtils.BEFORE_IMAGE, "");
     }
 
     private void submitQRcode(String houseid) {
@@ -1216,6 +1218,7 @@ public class QRcodeScannerActivity extends AppCompatActivity implements ZBarScan
         syncOfflineRepository.insertCollection(entity);
         Prefs.remove(AUtils.BEFORE_IMAGE);
         Prefs.remove(AUtils.AFTER_IMAGE);
+        Prefs.putString(AUtils.PREFS.IMAGE_POJO, null);
         showOfflinePopup(garbageCollectionPojo.getId(), entity.getGcType());
     }
 

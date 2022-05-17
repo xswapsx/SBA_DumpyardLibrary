@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,7 @@ import com.appynitty.swachbharatabhiyanlibrary.adapters.connection.EmpAttendance
 import com.appynitty.swachbharatabhiyanlibrary.adapters.connection.EmpCheckAttendanceAdapterClass;
 import com.appynitty.swachbharatabhiyanlibrary.adapters.connection.EmpSyncServerAdapterClass;
 import com.appynitty.swachbharatabhiyanlibrary.adapters.connection.EmpUserDetailAdapterClass;
+import com.appynitty.swachbharatabhiyanlibrary.adapters.connection.LocalityAdapterClass;
 import com.appynitty.swachbharatabhiyanlibrary.adapters.connection.ShareLocationAdapterClass;
 import com.appynitty.swachbharatabhiyanlibrary.dialogs.EmpPopUpDialog;
 import com.appynitty.swachbharatabhiyanlibrary.dialogs.IdCardDialog;
@@ -73,6 +75,8 @@ public class EmpDashboardActivity extends AppCompatActivity implements EmpPopUpD
     private TextView userName;
     private TextView empId;
     private ImageView profilePic;
+    int AppId = 0;
+    String locality;
     FrameLayout progressBar;
     private EmpInPunchPojo empInPunchPojo = null;
 
@@ -88,6 +92,8 @@ public class EmpDashboardActivity extends AppCompatActivity implements EmpPopUpD
     private EmpAttendanceAdapterClass mAttendanceAdapter;
 
     private EmpUserDetailAdapterClass mUserDetailAdapter;
+
+    private LocalityAdapterClass mLocalityAdapter;
 
     private boolean isFromAttendanceChecked = false;
 
@@ -264,6 +270,11 @@ public class EmpDashboardActivity extends AppCompatActivity implements EmpPopUpD
     }
 
     private void initComponents() {
+        AppId = Integer.parseInt(Prefs.getString(AUtils.APP_ID, ""));
+        locality = AUtils.getLocality(AppId);
+        Log.e(TAG, "initComponents: AppId: " + Prefs.getString(AUtils.APP_ID, ""));
+        Log.e(TAG, "initComponents: Ulb Name: " + AUtils.getLocality(AppId));
+
 
         getPermission();
 
@@ -283,6 +294,7 @@ public class EmpDashboardActivity extends AppCompatActivity implements EmpPopUpD
         mCheckAttendanceAdapter = new EmpCheckAttendanceAdapterClass();
         mAttendanceAdapter = new EmpAttendanceAdapterClass();
         mUserDetailAdapter = new EmpUserDetailAdapterClass();
+        mLocalityAdapter = new LocalityAdapterClass(mContext);
 
         fab = findViewById(R.id.fab_setting);
         menuGridView = findViewById(R.id.menu_grid);
@@ -307,6 +319,30 @@ public class EmpDashboardActivity extends AppCompatActivity implements EmpPopUpD
 
     private void registerEvents() {
 
+
+        mLocalityAdapter.getCurrentLocality(Prefs.getString(AUtils.LAT, null), Prefs.getString(AUtils.LONG, null));
+        mLocalityAdapter.setLocalityListener(new LocalityAdapterClass.LocalityListener() {
+            @Override
+            public void onSuccessCallback(String message) {
+                Log.e(TAG, "onSuccessCallback: " + message);
+                if (message.matches(locality)) {
+                    Log.e(TAG, "onSuccessCallback: Same ULB!");
+                    Prefs.putBoolean(AUtils.PREFS.IS_SAME_LOCALITY, true);
+                } else {
+                    Prefs.putBoolean(AUtils.PREFS.IS_SAME_LOCALITY, false);
+                }
+            }
+
+            @Override
+            public void onFailureCallback(String message) {
+                Log.e(TAG, "onFailureCallBack" + message);
+            }
+
+            @Override
+            public void onErrorCallback() {
+
+            }
+        });
         mCheckAttendanceAdapter.setCheckAttendanceListener(new EmpCheckAttendanceAdapterClass.CheckAttendanceListener() {
             @Override
             public void onSuccessCallBack(boolean isAttendanceOff, String message, String messageMar) {

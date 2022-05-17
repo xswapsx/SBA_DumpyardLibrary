@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.appynitty.swachbharatabhiyan">
+    package="com.appynitty.sba_DumpLib">
 
     <application
         android:name="com.appynitty.swachbharatabhiyanlibrary.utils.MyApplication"
@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.appynitty.sba_DumpLib.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

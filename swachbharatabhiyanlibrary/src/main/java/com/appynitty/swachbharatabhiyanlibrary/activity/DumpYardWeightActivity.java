@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
@@ -450,6 +451,9 @@ public class DumpYardWeightActivity extends AppCompatActivity {
 
                 finalPath = getRealPathFromURI(tempUri);
                 dryImageFilePath = finalPath; //setting image1 path that will be set in imagePojo. swapnil
+                imagePojo = new ImagePojo();
+                imagePojo.setImage1(dryImageFilePath);
+                Prefs.putString(AUtils.BEFORE_IMAGE, dryImageFilePath);
                 Log.e("Image1 Path: ", dryImageFilePath);
                 break;
             case 2:
@@ -518,6 +522,13 @@ public class DumpYardWeightActivity extends AppCompatActivity {
                 btnTakeWetPhoto.setImageURI(Uri.parse(imagePojo.getImage2()));
                 Log.e("Image2 from imagePojo: ", imagePojo.getImage2());
                 wetImageFilePath = imagePojo.getImage2();
+            } else if (!AUtils.isNullString(Prefs.getString(AUtils.BEFORE_IMAGE, null))) {
+                btnTakeDryPhoto.setImageURI(Uri.parse(Prefs.getString(AUtils.BEFORE_IMAGE, null)));
+            }
+        } else {
+            if (Prefs.contains(AUtils.BEFORE_IMAGE)) {
+                Bitmap myBitmap = BitmapFactory.decodeFile(Prefs.getString(AUtils.BEFORE_IMAGE, null));
+                btnTakeDryPhoto.setImageBitmap(myBitmap);
             }
         }
     }
@@ -586,15 +597,13 @@ public class DumpYardWeightActivity extends AppCompatActivity {
 
         if (
                 AUtils.isNullString(editTotal.getText().toString()) ||
-                        AUtils.isNullString(editDryTotal.getText().toString()) ||
-                        AUtils.isNullString(editWetTotal.getText().toString())
+                        AUtils.isNullString(editDryTotal.getText().toString())
         ) {
             AUtils.error(mContext, mContext.getString(R.string.plz_ent_all_fields));
             return false;
         } else if (
                 !AUtils.isNumeric(editTotal.getText().toString()) ||
-                        !AUtils.isNumeric(editDryTotal.getText().toString()) ||
-                        !AUtils.isNumeric(editWetTotal.getText().toString())
+                        !AUtils.isNumeric(editDryTotal.getText().toString())
         ) {
             AUtils.error(mContext, mContext.getString(R.string.plz_ent_only_number));
             return false;
@@ -643,6 +652,7 @@ public class DumpYardWeightActivity extends AppCompatActivity {
             Type type = new TypeToken<ImagePojo>() {
             }.getType();
             Prefs.putString(AUtils.PREFS.IMAGE_POJO, new Gson().toJson(imagePojo, type));
+
 
             return true;
         } else {

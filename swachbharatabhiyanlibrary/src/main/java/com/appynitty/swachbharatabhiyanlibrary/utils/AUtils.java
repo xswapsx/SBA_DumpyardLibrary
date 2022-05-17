@@ -66,12 +66,12 @@ public class AUtils extends CommonUtils {
 //    public static final String SERVER_URL = "http://192.168.200.3:6560/";
 
     //  Advanced Ghanta Gadi Live URL
-   // public static final String SERVER_URL = "http://202.65.157.253:6560";
+    public static final String SERVER_URL = "http://202.65.157.253:6560";
 
     /***
      * Staging port
      * */
-    public static final String SERVER_URL = "https://ictsbm.com:30443";
+//    public static final String SERVER_URL = "https://ictsbm.com:30443";
 
     //    Staging URL
 //    public static final String SERVER_URL = "http://115.115.153.117:4044/";
@@ -208,7 +208,7 @@ public class AUtils extends CommonUtils {
         String USER_TYPE_ID = "UserTypeId";
         String IS_GT_FEATURE = "isGtFeature";
         String IS_ON_DUTY = "isOnDuty";
-
+        String IS_SAME_LOCALITY = "isSameLocality";
         String IN_PUNCH_DATE = "IN_PUNCH_DATE";
 
         String IMAGE_POJO = "ImagePojo";
@@ -892,12 +892,12 @@ public class AUtils extends CommonUtils {
 
     public static File getCompressed(Context context, String path) throws IOException {
 
-        if(context == null)
+        if (context == null)
             throw new NullPointerException("Context must not be null.");
         //getting device external cache directory, might not be available on some devices,
         // so our code fall back to internal storage cache directory, which is always available but in smaller quantity
         File cacheDir = context.getExternalCacheDir();
-        if(cacheDir == null)
+        if (cacheDir == null)
             //fall back
             cacheDir = context.getCacheDir();
 
@@ -905,7 +905,7 @@ public class AUtils extends CommonUtils {
         File root = new File(rootDir);
 
         //Create ImageCompressor folder if it doesnt already exists.
-        if(!root.exists())
+        if (!root.exists())
             root.mkdirs();
 
         //decode and resize the original bitmap from @param path.
@@ -962,14 +962,137 @@ public class AUtils extends CommonUtils {
         return dp * context.getResources().getDisplayMetrics().density;
     }
 
-    public static float convertDpToPixel(float dp, Context context){
+    public static float convertDpToPixel(float dp, Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / displayMetrics.DENSITY_DEFAULT);
     }
 
-    public static float convertPixelsToDp(float px, Context context){
+    public static float convertPixelsToDp(float px, Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return px / ((float) context.getResources().getDisplayMetrics().densityDpi / displayMetrics.DENSITY_DEFAULT);
+    }
+
+    public interface UlbConstants {
+        String ETAPALLI = "Etapalli";
+        String BHAMRAGAD = "Bhamragad";
+        String GADCHIROLI = "Gadchiroli";
+        String CHAMORSHI = "Chamorshi";
+        String KHAPA = "Savner";
+        String MULCHERA = "Mulchera";
+        String DESAIGANJ = "Desaiganj (Vadasa)";
+        String AHERI = "Aheri";
+        String SIRONCHA = "Sironcha";
+        String ARMORI = "Armori";
+        String ALANDI = "Haveli";
+        String KALMESHWAR = "Kalameshwar";
+        String KUHI = "Kuhi";
+        String MAHADULA = "Kamptee Taluka";
+        String HINGNA = "Hingna";
+        String PARSEONI = "Parseoni";
+        String MOHPA = "Kalameshwar";
+        String AKLUJ = "Malshiras";
+        String NAGPUR = "101";
+        String WARDHA = "Wardha taluka";
+        String THANE = "Thane Municipal Corporation";
+        String KURKHEDA = "Kurkheda";
+        String PULGAON = "Deoli";
+        String MAUDA = "Mauda";
+        String ARVI = "Samudrapur";
+        String HINGANGHAT = "Hinganghat";
+        String MANGALWEDHA = "Mangalvedhe";
+        String APPYNITTY = "Nagpur";
+        String DAHANU = "Dahanu";
+        String MOHADI = "Mohadi";
+        String KHAMGAON = "Khamgaon";
+        String PALGHAR = "Palghar";
+        String DHANORA = "Dhanora";
+        String KORCHI = "Korchi";
+        String CHANDUR = "Chandur, Maharashtra";
+        String JINTUR = "Jintur";
+        String MANWATH = "Manwath";
+        String INDAPUR = "Indapur";
+
+    }
+
+    public static String getLocality(int AppId) {
+        switch (AppId) {
+            case 3047:
+                return UlbConstants.ETAPALLI;
+            case 3070:
+                return UlbConstants.BHAMRAGAD;
+            case 3071:
+                return UlbConstants.GADCHIROLI;
+            case 3073:
+                return UlbConstants.CHAMORSHI;
+            case 3078:
+                return UlbConstants.KHAPA;
+            case 3069:
+                return UlbConstants.MULCHERA;
+            case 3072:
+                return UlbConstants.DESAIGANJ;
+            case 3074:
+                return UlbConstants.AHERI;
+            case 3075:
+                return UlbConstants.SIRONCHA;
+            case 3076:
+                return UlbConstants.ARMORI;
+            case 3077:
+                return UlbConstants.ALANDI;
+            case 3079:
+                return UlbConstants.KALMESHWAR;
+            case 3080:
+                return UlbConstants.KUHI;
+            case 3081:
+                return UlbConstants.MAHADULA;
+            case 3082:
+                return UlbConstants.HINGNA;
+            case 3083:
+                return UlbConstants.PARSEONI;
+            case 3084:
+                return UlbConstants.MOHPA;
+            case 3085:
+                return UlbConstants.AKLUJ;
+            case 3068:
+                return UlbConstants.NAGPUR;
+            case 3087:
+                return UlbConstants.WARDHA;
+            case 3089:
+                return UlbConstants.KURKHEDA;
+            case 3090:
+                return UlbConstants.PULGAON;
+            case 3091:
+                return UlbConstants.MAUDA;
+            case 3092:
+                return UlbConstants.ARVI;
+            case 3093:
+                return UlbConstants.HINGANGHAT;
+            case 3095:
+                return UlbConstants.MANGALWEDHA;
+            case 3098:
+                return UlbConstants.APPYNITTY;
+            case 3086:
+                return UlbConstants.DAHANU;
+            case 3096:
+                return UlbConstants.MOHADI;
+            case 3097:
+                return UlbConstants.KHAMGAON;
+            case 3100:
+                return UlbConstants.DHANORA;
+            case 3101:
+                return UlbConstants.KORCHI;
+            case 3102:
+                return UlbConstants.CHANDUR;
+            case 3103:
+                return UlbConstants.JINTUR;
+            case 3104:
+                return UlbConstants.MANWATH;
+            case 3099:
+                return UlbConstants.PALGHAR;
+            case 3106:
+                return UlbConstants.INDAPUR;
+            default:
+                return "none";
+        }
     }
 
 }

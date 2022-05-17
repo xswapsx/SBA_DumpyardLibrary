@@ -4,46 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activity.DumpYardWeightActivity"
-    tools:showIn="@layout/activity_dump_yard_weight"
-    android:orientation="vertical">
+    tools:showIn="@layout/activity_dump_yard_weight">
 
     <ScrollView
-        android:layout_weight="0.8"
+        android:id="@+id/layout_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/layout_scroll">
+        android:layout_weight="0.8">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/layout_dy_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/dim_50_dp"
                 android:background="@drawable/white_background_bottom_border"
-                android:padding="@dimen/login_margin"
-                android:id="@+id/layout_dy_id"
-                android:layout_marginBottom="@dimen/dim_50_dp">
+                android:orientation="horizontal"
+                android:padding="@dimen/login_margin">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/dump_yard_id_txt"/>
+                    android:text="@string/dump_yard_id_txt" />
 
                 <TextView
                     android:id="@+id/txt_house_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/dim_5_dp"
+                    android:text="@string/hyphen"
                     android:textAllCaps="true"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:layout_marginStart="@dimen/dim_5_dp"
-                    android:text="@string/hyphen"/>
+                    android:textSize="18sp" />
 
             </LinearLayout>
 
@@ -51,81 +51,86 @@
                 android:id="@+id/layout_dry_weight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_below="@id/layout_dy_id"
+                android:layout_marginBottom="@dimen/dim_20_dp"
                 android:gravity="center_vertical"
-                android:paddingEnd="@dimen/dim_10_dp"
+                android:orientation="vertical"
                 android:paddingStart="0dp"
-                android:layout_marginBottom="@dimen/dim_20_dp">
+                android:paddingEnd="@dimen/dim_10_dp">
 
                 <ImageView
                     android:id="@+id/btn_take_dry_photo"
                     android:layout_width="@dimen/dim_120_dp"
                     android:layout_height="@dimen/dim_120_dp"
+                    android:layout_gravity="center_horizontal"
                     android:layout_marginStart="@dimen/dim_10_dp"
+                    android:layout_marginEnd="@dimen/dim_10_dp"
                     android:background="@color/colorDivider"
                     android:contentDescription="@string/title_activity_dump_yard_weight"
                     android:scaleType="center"
-                    android:src="@drawable/ic_photo_camera_light_gray_50dp"
-                    android:layout_marginEnd="@dimen/dim_10_dp"/>
+                    android:src="@drawable/ic_photo_camera_light_gray_50dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginEnd="@dimen/dim_5_dp">
+                    android:layout_marginTop="@dimen/dim_15_dp"
+                    android:layout_marginEnd="@dimen/dim_5_dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/label_dry_weight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/total_dry_weight"
                         android:gravity="center_horizontal"
-                        android:textSize="@dimen/dim_18_sp"/>
+                        android:text="@string/total_weight"
+                        android:textSize="@dimen/dim_18_sp" />
 
                     <EditText
                         android:id="@+id/txt_dry_weight"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
                         style="@style/CustomEditTextStyleLight"
+                        android:layout_width="@dimen/dim_120_dp"
+                        android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:textSize="@dimen/dim_14_sp"/>
+                        android:textAlignment="center"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="@dimen/dim_14_sp" />
 
                     <RadioGroup
                         android:id="@+id/radio_dry_weight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:weightSum="2"
-                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/dim_10_dp"
                         android:checkedButton="@id/radio_dry_kg"
-                        android:layout_marginTop="@dimen/dim_10_dp">
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
 
                         <RadioButton
                             android:id="@+id/radio_dry_kg"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:layout_weight="0.5"
                             android:background="@drawable/radio_selector"
                             android:button="@null"
                             android:gravity="center"
                             android:padding="@dimen/dim_2_dp"
                             android:text="@string/unit_kg"
                             android:textColor="@color/radio_text_color_selector"
-                            android:textSize="@dimen/dim_18_sp"/>
+                            android:textSize="@dimen/dim_18_sp" />
 
                         <RadioButton
-                            android:visibility="gone"
                             android:id="@+id/radio_dry_ton"
                             android:layout_width="0dp"
-                            android:gravity="center"
                             android:layout_height="@dimen/dim_30_dp"
                             android:layout_weight="1"
-                            android:textColor="@color/radio_text_color_selector"
+                            android:background="@drawable/radio_selector"
+                            android:button="@null"
+                            android:gravity="center"
                             android:padding="@dimen/dim_2_dp"
                             android:text="@string/unit_ton"
-                            android:button="@null"
-                            android:background="@drawable/radio_selector"
-                            android:textSize="@dimen/dim_18_sp"/>
+                            android:textColor="@color/radio_text_color_selector"
+                            android:textSize="@dimen/dim_18_sp"
+                            android:visibility="gone" />
                     </RadioGroup>
 
                 </LinearLayout>
@@ -136,82 +141,83 @@
                 android:id="@+id/layout_wet_weight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_below="@id/layout_dry_weight"
+                android:layout_marginBottom="@dimen/dim_20_dp"
                 android:gravity="center_vertical"
-                android:paddingEnd="@dimen/dim_10_dp"
+                android:orientation="horizontal"
                 android:paddingStart="0dp"
-                android:layout_marginBottom="@dimen/dim_20_dp">
+                android:paddingEnd="@dimen/dim_10_dp"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/btn_take_wet_photo"
                     android:layout_width="@dimen/dim_120_dp"
                     android:layout_height="@dimen/dim_120_dp"
                     android:layout_marginStart="@dimen/dim_10_dp"
+                    android:layout_marginEnd="@dimen/dim_10_dp"
                     android:background="@color/colorDivider"
                     android:contentDescription="@string/title_activity_dump_yard_weight"
                     android:scaleType="center"
-                    android:src="@drawable/ic_photo_camera_light_gray_50dp"
-                    android:layout_marginEnd="@dimen/dim_10_dp"/>
+                    android:src="@drawable/ic_photo_camera_light_gray_50dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginEnd="@dimen/dim_5_dp">
+                    android:layout_marginEnd="@dimen/dim_5_dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/label_wet_weight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
                         android:text="@string/total_wet_weight"
-                        android:textSize="@dimen/dim_18_sp"
-                        android:gravity="center_horizontal"/>
+                        android:textSize="@dimen/dim_18_sp" />
 
                     <EditText
                         android:id="@+id/txt_wet_weight"
+                        style="@style/CustomEditTextStyleLight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/CustomEditTextStyleLight"
                         android:inputType="numberDecimal"
-                        android:textSize="@dimen/dim_14_sp"/>
+                        android:textSize="@dimen/dim_14_sp" />
 
                     <RadioGroup
-                        android:gravity=""
                         android:id="@+id/radio_wet_weight"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:weightSum="2"
-                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/dim_10_dp"
                         android:checkedButton="@id/radio_wet_kg"
-                        android:layout_marginTop="@dimen/dim_10_dp">
+                        android:gravity=""
+                        android:orientation="horizontal"
+                        android:weightSum="2">
 
                         <RadioButton
                             android:id="@+id/radio_wet_kg"
                             android:layout_width="0dp"
-                            android:gravity="center"
                             android:layout_height="@dimen/dim_30_dp"
                             android:layout_weight="1"
-                            android:textColor="@color/radio_text_color_selector"
+                            android:background="@drawable/radio_selector"
+                            android:button="@null"
+                            android:gravity="center"
                             android:padding="@dimen/dim_2_dp"
                             android:text="@string/unit_kg"
-                            android:button="@null"
-                            android:background="@drawable/radio_selector"
-                            android:textSize="@dimen/dim_18_sp"/>
+                            android:textColor="@color/radio_text_color_selector"
+                            android:textSize="@dimen/dim_18_sp" />
 
                         <RadioButton
-                            android:visibility="gone"
                             android:id="@+id/radio_wet_ton"
                             android:layout_width="0dp"
-                            android:gravity="center"
                             android:layout_height="@dimen/dim_30_dp"
                             android:layout_weight="1"
-                            android:textColor="@color/radio_text_color_selector"
+                            android:background="@drawable/radio_selector"
+                            android:button="@null"
+                            android:gravity="center"
                             android:padding="@dimen/dim_2_dp"
                             android:text="@string/unit_ton"
-                            android:button="@null"
-                            android:background="@drawable/radio_selector"
-                            android:textSize="@dimen/dim_18_sp"/>
+                            android:textColor="@color/radio_text_color_selector"
+                            android:textSize="@dimen/dim_18_sp"
+                            android:visibility="gone" />
                     </RadioGroup>
 
                 </LinearLayout>
@@ -225,49 +231,49 @@
                 android:layout_below="@id/layout_wet_weight"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="@dimen/dim_20_dp"
-                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/dim_20_dp"
                 android:gravity="center"
-                android:layout_marginBottom="@dimen/dim_20_dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/label_total_weight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/total_weight"
                     android:layout_marginEnd="@dimen/dim_10_dp"
                     android:gravity="center_horizontal"
-                    android:textSize="@dimen/dim_18_sp"/>
+                    android:text="@string/total_weight"
+                    android:textSize="@dimen/dim_18_sp" />
 
                 <TextView
                     android:id="@+id/txt_total_weight"
                     android:layout_width="@dimen/dim_150_dp"
                     android:layout_height="@dimen/dim_50_dp"
-                   android:enabled="false"
                     android:background="@drawable/radio_group_border"
+                    android:enabled="false"
                     android:gravity="center"
-                    android:textSize="@dimen/dim_20_sp"
                     android:textColor="@color/black"
+                    android:textSize="@dimen/dim_20_sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/unit_kg"
                     android:layout_marginStart="@dimen/dim_10_dp"
-                    android:textSize="@dimen/dim_18_sp"/>
+                    android:text="@string/unit_kg"
+                    android:textSize="@dimen/dim_18_sp" />
 
             </LinearLayout>
 
             <Button
+                android:id="@+id/btn_submit_dump"
                 style="@style/MyButtonStyle"
                 android:layout_below="@id/layout_total_weight"
                 android:layout_alignParentBottom="true"
-                android:id="@+id/btn_submit_dump"
-                android:text="@string/submit_txt"
+                android:layout_gravity="bottom"
                 android:layout_marginStart="70dp"
                 android:layout_marginEnd="70dp"
-                android:layout_gravity="bottom"
-                android:layout_marginBottom="@dimen/dim_10_dp"/>
+                android:layout_marginBottom="@dimen/dim_10_dp"
+                android:text="@string/submit_txt" />
 
         </RelativeLayout>
 
